@@ -5,14 +5,13 @@
 int main(int argc, char** argv)
 {
     unsigned long mem;
+    mem = 1024*1024;
     if(argc==1)
       {
-        mem = 1024*1024*256;
         printf("Using Default : Allocating 256 MB\n");
         int i;
      for( i = 1; i <=256; i++ ){
          printf("Allocating : %d MB\n", i);
-         mem = 1024*1024*i;
          char* ptr = malloc(mem);
          memset(ptr, 0, mem);
          sleep(1);
@@ -24,7 +23,6 @@ int main(int argc, char** argv)
         int i;
      for( i = 1; i <=(unsigned) atol(argv[1]); i++ ){
          printf("Allocating : %d MB\n", i);
-         mem = 1024*1024*i;
          char* ptr = malloc(mem);
          memset(ptr, 0, mem);
          sleep(1);
