@@ -1,23 +1,16 @@
+I- Hardware
 
-Hardware
+Memory Zones (for 64-bit processors)
+DMA    (first 16MB of memory 24-bit I/O)
+DMA32  (16MB to 4GB 32-bit I/O)
+Normal (4GB to end of RAM...)
 
 
-Memory Zones for 64-bit processors
-DMA
-The first 16MB of memory
-24-bit I/O
+II- Memory Fragmentation and Compaction
 
-DMA32
-16MB to 4GB
-32-bit I/O, Normal zone overflow
+Fragmentation information can be displayed in /proc/buddyinfo file simplified in the below output 
 
-Normal
-4GB to end of RAM....
-Kernel static, Slab, Buffers, Driver Aloc, User O'flow User anonymous, pagecache, pagetables
-
-/proc/buddyinfo Fragmenetion
-
-Order             0       1      2      3      4      5      6      7      8      9     10 
+               Order             0       1      2      3      4      5      6      7      8      9     10 
                Zone 4k Pages     1       2      4      8     16     32     64    128    256    512   1024
                Zone Byte Size  4kB     8kB   16kB   32kB   64kB  128kB  256kB  512kB 1024kB 2048kB 4096kB
                         |                                                                                |   
@@ -28,9 +21,13 @@ Node 0, zone    DMA32   |    8774    4785   2383   1472   1102    840    606    
 Node 0, zone   Normal   |  147104  336891 113434 136648  72075  29349   9539   3304   1481    727      0 |
 Node 1, zone   Normal   | 1211026 1381111 482960  82119   7636    924    186     83    283      1      0 |
 
-Compact Memory 
+Furthermore /proc/pagetypeinfo file classify these pages by type (Unmovable,Reclaimable,Movable,Reserve,Isolate)
+Compaction 
 
+III- HugePage and Transparent Huge Pages (THP)
 
-HugePage
-
-Transparent Huge Pages
+IV- SWAP 
+SWAP is disk space used in case of memory pressure to swap-out pages 
+I- OOM
+Out of Memory  killer is kicking in is purely based on the availability of free pages. 
+This could be a page alloc failure from any memory zones
