@@ -27,7 +27,11 @@ Compaction
 III- HugePage and Transparent Huge Pages (THP)
 
 IV- SWAP 
-SWAP is disk space used in case of memory pressure to swap-out pages 
+SWAP is disk space used in case of memory pressure to swap-out pages
+ it's better to swap out a program that's been inactive for a while, and instead keep often-used files in cache
+ LRU in inactive memory 
+ 
+ 
 I- OOM
 Out of Memory  killer is kicking in is purely based on the availability of free pages. 
 This could be a page alloc failure from any memory zones
