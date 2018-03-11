@@ -25,6 +25,17 @@ Furthermore /proc/pagetypeinfo file classify these pages by type (Unmovable,Recl
 Compaction 
 
 III- HugePage and Transparent Huge Pages (THP)
+Setting Transparent Huge Pages /sys/kernel/mm/transparent_hugepage/enabled)
+ always  : enabled 
+ madvise : disable hugepages system-wide only in madvise regions
+ never   : disabled 
+ 
+Defragmentation (/sys/kernel/mm/transparent_hugepage/defrag)
+always  : enabled
+madvise : defrag only in madvise regions
+never   : disbaled regular pages served
+/sys/kernel/mm/transparent_hugepage/use_zero_page
+
 
 IV- SWAP 
 SWAP is disk space used in case of memory pressure to swap-out pages
