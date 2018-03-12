@@ -19,19 +19,19 @@ Limit*=<soft>:<hard> (1)
 
 # Limits types man systemd.exec
  
-CPU
-FSIZE
-DATA
-STACK
-CORE
-RSS
-NOFILE
-AS
-NPROC
-MEMLOCK
-LOCKS
-SIGPENDING
-MSGQUEUE
-NICE
-RTPRIO
-RTTIME
+LimitCPU
+LimitFSIZE
+LimitDATA
+LimitSTACK
+LimitCORE
+LimitRSS
+LimitNOFILE
+LimitAS
+LimitNPROC
+LimitMEMLOCK
+LimitLOCKS
+LimitSIGPENDING
+LimitMSGQUEUE
+LimitNICE
+LimitRTPRIO
+LimitRTTIME
