@@ -18,21 +18,19 @@ user             soft           nproc,cpu
 
 # Items List
 
-core
-data
-fsize
-memlock
-nofile
-rss
-stack
-cpu
-nproc
-as
-maxlogins
-maxsyslogins
-priority
-locks
-sigpending
-msgqueue
-nice [-20,19]
-rtprio
+core                limits the core file size (KB)
+data                maximum data size (KB)
+fsize               maximum filesize (KB)
+memlock             maximum locked-in-memory address space (KB)
+nofile              maximum number of open file descriptors
+rss                 
+stack               maximum stack size (KB)
+cpu                 maximum CPU time (minutes)
+nproc               maximum number of processes
+as                  address space limit (KB)
+maxlogins           maximum number of logins for this user (uid=0 not applied)
+maxsyslogins        maximum number of all logins on system (uid=0 not applied)
+priority            the priority to run user process with (negative values boost process priority)
+locks               maximum locked files
+nice [-20,19]       maximum nice priority allowed to raise to
+rtprio              maximum realtime priority allowed for non-privileged processes
