@@ -1,0 +1,38 @@
+# ulimit to limit resources
+
+# ulimit command line used to query or set limit for single use shell
+
+ulimit -S(Soft) -H(Hard) -options -a(List all)
+
+# persistent ulimit
+ 
+PAM auth module call to PAM limits (/etc/pam.d/system-auth)
+PAM limits config in /etc/security/limits.conf /etc/security/limits.d/*.conf
+
+# man limits.conf 
+# /etc/security/limits.conf
+
+<domain> 	<type> 		<item> 		<limit>
+user             soft           nproc,cpu        
+@group           hard           maxlogins,rss
+
+# Items List
+
+core
+data
+fsize
+memlock
+nofile
+rss
+stack
+cpu
+nproc
+as
+maxlogins
+maxsyslogins
+priority
+locks
+sigpending
+msgqueue
+nice [-20,19]
+rtprio

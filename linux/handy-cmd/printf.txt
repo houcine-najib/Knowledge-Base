@@ -1,0 +1,22 @@
+%x,%X hexadecimal
+%s String
+%f floating
+%d decimal
+%b string with escape character 
+
+#Substring
+printf %.*s <offset> "<string>"
+printf %<offset>.s "<string>"
+printf %-<Padding-Number>.<offset>s <string>
+
+#Escape Character
+\n newline
+\r return
+\t tab
+\b backspace
+
+# Multiple Option 
+printf "<Option1><Option2>" 
+
+# String 
+printf <string> = printf '<string>\<esc-char>' = printf "<string>%<Option>\<esc-char>

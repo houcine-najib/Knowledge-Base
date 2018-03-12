@@ -1,0 +1,20 @@
+# date command handy format
+
+# usage
+date +Format
+
+# handy formats
+
+%T : time only   : HH:MM:SS
+%N : nanoseconds : 000000000..999999999
+%H : hours       : 0..23
+%M : minutes     : 0..59
+%S : seconds     : 0..59
+%y : year(Half)  : 00..99
+%Y : Year Full   : 1970...
+%A : day name    : Sunday...
+%d : day number  : 1..31
+%B : month name  : January...
+%m : month number: 1..12
+%D : date only   : mm/dd/yy
+

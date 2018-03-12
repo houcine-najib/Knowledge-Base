@@ -1,0 +1,12 @@
+The switch between different processes is called a context switch,
+
+because when it happens, the CPU saves all the context information from the old
+
+process and retrieves all the context information for the new process
+
+the context switches are most likely caused by an I/O request or some
+
+other long-running system call (such as a sleep).
+
+Voluentary Context Switch : Requested by the process blocked by I/O
+Non-Voluentary Context Switch : Caused by kernel timer interrupt to schedule another process

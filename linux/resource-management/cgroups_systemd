@@ -1,0 +1,106 @@
+
+# Units Types
+service : service or application
+socket  : network/IPC socket or FIFO buffer associated with service file
+device  : udev/sysfs device
+mount   : mountpoints (units are entries of /etc/fstab)
+automount 
+swap    : swap space (device/file path)
+target  : 
+path    :
+timer   : schedule activation (cron job)
+snapshot: revert to current state after changing (systemctl snapshot ,session based temporary)
+slice   : linux control goup nodes , manage resources of set of processes(service/scope) default :root,user,system
+scope   : externally created system process
+
+# Drop-ins and snippets
+Unit extension , create directory with unit-name.d and files with .conf extension to override or extend the unit
+
+# Create transient scope/service unit marked as static(without configuration file)
+systemd-run --unit=name --scope --slice=slice_name command
+name    = unit name
+--scope = foreground (Default service in background)
+--slice = slice(new) default(system)
+
+#Remove transient unit
+systemctl stop name.service
+systemctl kill name.service --kill-who=PID,... --signal=signal
+--kill-who (Optional) = select processes from cgroup to terminate
+--signal   (Optional) = select signal default SIGTERM
+
+# Modify Systemd units
+
+# On the fly
+systemctl set-property  --runtime unit-name property=value
+--runtime (Optional) = make non-persistent change to persistent  units
+--runtime (Mandatory)= make change to transient units
+
+# Edit Unit file
+systemclt  daemon-reload
+systemclt  restart <unit_name>.<unit_type>
+
+
+# List of Systemd CGroup properities
+# Documentation in man systemd.resource-control
+
+# CPU Configuration for Systemd Unit
+
+CPUAccounting    = true/false (true for all units in slice and slice parents)
+CPUShares        = weight of cpu (defaults 1024) at runtime and startup (if StartupCPUShares set)
+StartupCPUShares = weight of cpu on startup only
+CPUQuota         =  % of CPU time (> 100 more than one cpu)
+
+# RAM Configuration for Systemd Unit
+
+MemoryAccounting = true/false (true for all units in slice and slice parents)
+MemoryLimit      = Limit of memory in bytes
+
+# Block I/O Configuration for Systemd Unit
+
+BlockIOAccounting     = true/false (true for all units in slice and slice parents)
+BlockIOWeight         = weight (block IO between 10 & 1000:default)
+StartupBlockIOWeight  = weight (at startup)
+BlockIODeviceWeight   = device (dev path,file path) weight(between 10 & 1000)
+BlockIOReadBandwidth  = device (dev path,file path:backing dev)  bytes (bytes:K,M,G per second) **Buffer Support**
+BlockIOWriteBandwidth = device bytes **No Buffer Support**
+
+# Task Configuration for Systemd Unit
+
+TaksAccounting = true/false (keep track of unit tasks ,true for all units in slice and slice parents)
+TasksMax       = Number of threads(kernel and usespace) or % of system max tasks 
+
+
+# Other Configuration for Systemd Unit 
+
+DeviceAllow    = device_name(path or group in /proc/devices) options(r,w,m:create)
+DevicePolicy   = auto   (default allow access to all devices)
+                 closed (allow only pseudo devices :/dev/null,/dev/zero..)
+                 strict (allow access specified by DeviceAllow)
+Slice          = slice name default is system
+ExecStartPost  = command used to modify other unsupported features by systemd
+               = /bin/bash -c "echo <parameter> > /sys/fs/cgroup/<resource_controller>/<slice>/<subsystem>/<parameter_file>"
+
+# Monitor CGroup
+
+systemd-cgls   = dislay hierarchy of cgroups
+systemd-cgls   = cpu    (service that interact with cpu controller)
+                 memory (memory controller)
+                 blkio  (block IO controller)
+
+systemd-cgtop  = top like resources consumption for cgroups
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

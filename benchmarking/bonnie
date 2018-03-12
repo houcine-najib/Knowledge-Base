@@ -1,0 +1,58 @@
+Bonnie++ 
+
+You must use the "-u" switch when running as root.usage:
+
+bonnie++ [-d scratch-dir] [-c concurrency] [-s size(MiB)[:chunk-size(b)]]
+      [-n number-to-stat[:max-size[:min-size][:num-directories[:chunk-size]]]]
+      [-m machine-name] [-r ram-size-in-MiB]
+      [-x number-of-tests] [-u uid-to-use:gid-to-use] [-g gid-to-use]
+      [-q] [-f] [-b] [-p processes | -y] [-z seed | -Z random-file]
+      [-D]
+
+Version: 1.96
+
+Options : 
+
+-d directory to run the test on
+-c Number of Threads to simulate concurrent file access  
+-s:chunk-size  size of the I/O test in MB (use 1.5x-2x of RAM): block size  eg 1g:4k default 8k
+
+-n 
+
+number:max:min:num-directories:chunk-size  
+
+number          : Number of files for the file creeation tst (multiples of 1024)
+max:min         : max is the maximum size and min is the minimum size (both default to 0 if not specified). 
+                  If minimum and maximum sizes are specified then every file will have a random size from the range min..max inclusive
+num-directories : Number of directories if specified files will be evenly distributed amoung that many sub-directories
+chunk-size      :  block size ensure you use the same chunksize for both -n and -s
+
+-m name of the machine (display purposes).
+-r amount of RAM in MB
+
+-x number of test to be performed
+This are not required if you are not running as root:
+-u [uid|username] is the uid to run the test with (-u 0 or -u root )
+-g [gid|group] is the gid to run the test with
+
+-f fast mode, skips per-char IO tests.
+-b no write buffering. fsync() after every write.
+
+Example: 
+
+bonnie++ -d /data/sdc -n 98:800k:500k:1000:32k -s 16384k:32k -u root
+
+Output:
+
+Latency number correspond with the above operations – this is the full round-trip time it takes for bonnie++ to perform the operations.
+
+Anything showing multiple +++ is because the test could not be ran with reasonable assurance on the results because they completed too quickly. 
+Increase -n to use more files in the operation and see the results
+
+Sequential Output : Limited by Network Conditions or Limited by client's single CPU speed
+Sequential Input  : Limited by Network Conditions or Limited by client's single CPU speed
+#########################################################################################
+Sequential Create : Limited by Operational Latency
+Random Create     : Limited by Operational Latency
+
+

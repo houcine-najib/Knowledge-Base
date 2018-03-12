@@ -1,0 +1,37 @@
+# Systemd Services Limit
+Service Unit files are typically loacted in /usr/lib/systemd/system or /etc/systemd/system
+
+# Set Systemd Service Limit
+
+# Method-1 
+Edit unit file directly.
+
+# Method-2
+Systemd drop-in : 
+Create limit conf file for service in service directory /etc/systemd/system/<service>.service.d/<conf-limits>.conf
+
+# Unit Content
+[Service]
+Limit*=<soft>:<hard> (1)
+
+(*) Refer to limits types below 
+(1) Set both soft and hard if one value is sepcified
+
+# Limits types man systemd.exec
+ 
+CPU
+FSIZE
+DATA
+STACK
+CORE
+RSS
+NOFILE
+AS
+NPROC
+MEMLOCK
+LOCKS
+SIGPENDING
+MSGQUEUE
+NICE
+RTPRIO
+RTTIME

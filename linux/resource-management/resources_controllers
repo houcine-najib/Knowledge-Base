@@ -1,0 +1,212 @@
+# Resources Controllers
+# Note: most resources controllers parameters are not supported by systemd
+#
+0- Resources Controllers Types:
+
+blkio
+cpuacct
+cpuset 
+devices 
+freezer 
+memory 
+net_cls,net_prio(1)
+
+(1) These kernel built-in modules(2) are not loaded by default,in order to load them use : modprobe <module_name>
+(2) Refer to Kernel Modules section
+
+# To list all resources controllers 
+/proc/cgroups : file contain a list of all cgroups supported by the kernel an thier hierarchy
+lssubsys -am  : list all cgroup subsystem and thier mount points
+
+# Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/cgroups/*.txt
+
+1- Resource Controller : blkio
+# Documentation in blkio-controller.txt
+
+# Parameters files
+blkio resource controller files parameters exist in :
+/sys/fs/cgroup/blkio
+
+For systemd unit with :  BlockIOAccounting=true
+/sys/fs/cgroup/<slice_name>/<service_name>/blkio
+
+# Proportional Weight Division ( Only for Completely Fair Queuing (CFQ) I/O scheduler)
+blkio.weight           = per cgroup weight (default all devices ).       Syntax <weight> (10 to 1000 : default 500)
+blkio.weight_device    = per cgroup per device.                          Syntax <major>:<minor> <weight>
+
+
+# Stats 
+type, <type> : read,write,sync,async
+
+blkio.time             = disk time allocated per device in milliseconds. Syntax dev_maj:dev_minor time
+blkio.sectors          = number of sectors transferred to/from disk.     Syntax dev_maj:dev_minor sectors_number
+blkio.io_service_bytes = number of bytes transferred to/from the disk.   Syntax dev_maj:dev_minor type bytes_number
+blkio.io_serviced      = number of io    transferred to/from the disk.   Syntax dev_maj:dev_minor type io_number
+blkio.io_service_time  = service time for a given IO in ns               Syntax dev_maj:dev_minor type io_time_ns
+blkio.io_wait_time     = wait in scheduler queues for IO  service in ns  Syntax dev_maj:dev_minor type io_wait_time_ns 
+blkio.io_merged        = number of merged bios/requests into IO          Syntax type  request_number  
+blkio.io_queued        = number of queued requests                       Syntax type  queued_request_number
+
+# I/O Throttling 
+blkio.throttle.read_bps_device   = limit  on READ  rate        from the device. Syntax: <major>:<minor>  <rate_bytes_per_second>
+blkio.throttle.write_bps_device  = limit  on WRITE rate        from the device. Syntax: <major>:<minor>  <rate_bytes_per_second>
+blkio.throttle.read_iops_device  = limit  on READ  rate        from the device. Syntax: <major>:<minor>  <rate_io_per_second>
+blkio.throttle.write_iops_device = limit  on WRITE rate        from the device. Syntax: <major>:<minor>  <rate_io_per_second>
+blkio.throttle.io_serviced       = number of IO    completed   to/from the disk.Syntax: <major>:<minor>  <type> <number_io>
+blkio.throttle.io_service_bytes  = number of BYTES transferred to/from the disk.Syntax: <major>:<minor>  <type> <number_bytes>
+ 
+# Other blkio parameters
+blkio.reset_stats = Reset all stats for cgroup. Syntax : write integer
+
+
+2- Resource Controller : memory
+# Documentation in memory.txt
+
+# Parameters files
+memory resource controller files parameters exist in :
+/sys/fs/cgroup/memory/<cgroup_name>
+
+For systemd unit with :  MemoryAccounting=true
+/sys/fs/cgroup/<slice_name>/<service_name>/memory
+
+# Disabling CGroup Memory Subsystem
+memory subsystem add overhead (40 bytes/page) in physical memory.
+can be disabled by adding in bootloader parameters : cgroup_disable=memory
+
+# memory subsystem parameters
+memory.limit_in_bytes              # set/show limit of memory usage
+memory.memsw.limit_in_bytes        # set/show limit of memory+Swap usage
+memory.soft_limit_in_bytes         # set/show soft limit of memory usage
+memory.kmem.tcp.limit_in_bytes     # set/show hard limit for tcp buf memory
+memory.kmem.limit_in_bytes         # set/show hard limit for kernel memory
+memory.swappiness                  # set/show swappiness parameter of vmscan :sysctl vm.swappiness
+memory.pressure_level              # set      memory pressure notifications
+memory.oom_control                 # set/show oom controls: 0 enable, 1 disbale.
+
+# Memory Stat
+memory.usage_in_bytes              # show     current usage for memory
+memory.memsw.usage_in_bytes        # show     current usage for memory+Swap
+memory.failcnt                     # show     the number of memory usage hits limits
+memory.memsw.failcnt               # show     the number of memory+Swap hits limits
+memory.stat                        # show     various statistics
+
+
+3- Resource Controller : cpu,cpuacct,cpusets
+# Documentation in cpusets.txt,cpuacct.txt
+
+# Parameters files
+CPU resource controller files parameters exist in :
+/sys/fs/cgroup/cpuset/<cgroup_name>  
+/sys/fs/cgroup/cpu,cpuacct/cgroup_name>
+
+For systemd unit with :  CPUAccounting=true
+/sys/fs/cgroup/<slice_name>/<service_name>/cpu,cpuacct
+/sys/fs/cgroup/<slice_name>/<service_name>/cpuset
+
+# CPU Sharing : CPU
+3.1- Completely Fair Scheduler (CFS)
+
+cpu.cfs_period_us   = period in µs a cgroup reallocate CPU resource. 
+cpu.cfs_quota_us    = amount of time in µs all tasks in cgroup can run during a period.
+                      max =1s (1 000 000 µs) : min =1000 µs
+
+Example: 
+To allow a cgroup to fully utilize two CPU set  cpu.cfs_period_us=100,000 and cpu.cfs_quota_us=200,000
+
+cpu.shares          = CPU time share for cgroup (distributed on all CPUs) as number.Example 1000
+
+cpu.stat.nr_periods     = number of periods (cpu.cfs_period_us) that have elapsed.
+cpu.stat.nr_throttled   = number of times tasks in a cgroup not allowled to run (consumed quota)
+cpu.stat.throttled_time = total time (in ns) for which tasks in a cgroup have been throttled.
+
+3.2-  RT (Real Time)
+
+cpu.rt_period_us    = time intervals in µs for cgroup to reallocate CPU resource.
+cpu.rt_runtime_us   = longest continuous period cgroup have access to CPU resource. 
+
+Exmaple:
+Setting cpu.rt_period_us=1,000,000 and cpu.rt_runtime_us=200,000 allow cgroup to run for 0.4 second on 2xCPU system.
+
+# CPU Stat : CPUACCT
+cpuacct.usage        = total CPU time in ns for all cgroup
+cpuacct.usage_percpu = total CPU time in ns for all cgroup per CPU
+
+# CPU Affinity : CPUSET
+cpuset.cpus       = set CPU affinity for all tasks in cgroup
+cpuset.mems       = set Memory node  for all tasks in cgroup 
+
+Exmaple
+cpuset.cpus=0-3,7 (0,1,2,3,7)
+cpuset.mems=0-3,7 (0,1,2,3,7)
+
+
+4- Resource Controller : net_cls & net_prio
+# Documentation in net_cls.txt,net_prio.txt
+#
+# Parameters files
+# Network resource controller files parameters exist in :
+ /sys/fs/cgroup/<cgroup_name>/net_cls & /sys/fs/cgroup/<cgroup_name>/net_prio
+#
+
+net_prio.ifpriomap = map network interface to traffic priorities for a process(originating) in cgroup
+                     Syntax <network_interface> <priority> E.g:eth0 5
+
+
+5- Create and Configure a CGroup
+
+In order to create a cgroup for a resources controller:
+mkdir /sys/fs/cgroup/<resource_controller>/<cgroup_name>
+# The new directory will inherit the hierarcy of parent resource controller.
+
+To assign a process to a cgroup: 
+echo $PID > /sys/fs/cgroup/<resource_controller>/<cgroup_name>/tasks
+
+Or configure through rules in  /etc/cgrules.conf. 
+
+Syntax: <user>:<process name>    <controllers>       <destination>
+   user         = an user or  @group or * for all
+   process_name = a process name or command full path
+   controllers  = list of resources controllers(sperated by ,) or * for all mounted 
+   destination  = path relative to the controller hierarchy
+
+Exmaple: 
+
+Restart cgred service in order for changes to take effect
+systemctl restart cgred
+
+
+
+
+
+tasks
+contains a list of processes, represented by their PIDs, that are running in a cgroup. The list of PIis not guaranteed to be ordered or unique (that is, it may contain duplicate entries). Writing a PID
+into the tasks file of a cgroup moves that process into that cgroup.
+
+cgroup.procs
+contains a list of thread groups, represented by their TGIDs, that are running in a cgroup. The listTGIDs is not guaranteed to be ordered or unique (that is, it may contain duplicate entries). WritinTGID into the cgroup.procs file of a cgroup moves that thread group into that cgroup.
+
+cgroup.event_control
+along with the cgroup notification API, allows notifications to be sent about a changing status ofcgroup.
+
+notify_on_release
+contains a Boolean value, 1 or 0, that either enables or disables the execution of the release ageIf the notify_on_release parameter is enabled, the kernel executes the contents of the
+release_agent file when a cgroup no longer contains any tasks (that is, the cgroup's tasks fcontained some PIDs and those PIDs were removed, leaving the file empty). A path to the empty
+cgroup is provided as an argument to the release agent.
+The default value of the notify_on_release parameter in the root cgroup is 0. All non-root
+cgroups inherit the value in notify_on_release from their parent cgroup.
+
+
+
+
+
+
+release_agent (present in the root cgroup only)
+contains a command to be executed when a “notify on release” is triggered. Once a cgroup is
+emptied of all processes, and the notify_on_release flag is enabled, the kernel runs the
+command in the release_agent file and supplies it with a relative path (relative to the root
+cgroup) to the emptied cgroup as an argument. The release agent can be used, for example, to
+automatically remove empty cgroups; for more information, see Example 3.4, “Automatically
+removing empty cgroups”.
+
+
+

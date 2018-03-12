@@ -1,0 +1,103 @@
+# Using YUM Repositry
+yum install httpd ==> /etc/httpd/httpd.conf 
+###############################################################################################
+# Manual Apache 2 Installation 
+wget -v http://www-eu.apache.org/dist//apr/apr-util-1.5.4.tar.gz # ARP(Apache Runtime Portable)
+wget -v http://www-eu.apache.org/dist//apr/apr-1.5.2.tar.gz      # ARP(Apache Runtime Portable)
+wget -v http://www-eu.apache.org/dist/httpd/httpd-2.4.20.tar.gz  # HTTPD 
+# Note:If wget is not installed or there is no internet connection just download the 3 (Verfiy the Intergrity)
+###############################################################################################
+# Create Apache Directory
+mkdir /usr/local/apache2 ( or mkdir /usr/share/apache2)
+# Extract httpd,arp and arp-util
+tar -xvf apr-util-1.5.4.tar.gz 
+tar -xvf apr-1.5.2.tar.gz
+tar -xvf httpd-2.4.20.tar.gz
+# Move ARP into /apache2/httpd-2.4.20/srclib/
+mv -R apr-util-1.5.4/ /apache2/httpd-2.4.20/srclib/
+mv -R apr-1.5.2/  /apache2/httpd-2.4.20/srclib/
+#Rename ARP Folder
+mv apr-1.5.2/ apr/
+mv apr-util-1.5.4/ apr-util
+###############################################################################################
+# PreInstallation Apache2 Configuration
+cd /usr/local/apache2
+./configure 
+#See Appendix B for advanced options
+###############################################################################################
+#Note if configure was unable to complete install pcre-devel
+yum install pcre-devel.x86_64
+###############################################################################################
+# Apache Installation (User Must be Sudoer)
+make
+make install
+###############################################################################################
+#Post Installation 
+Verfiy that modules are compilated properly 
+Under /usr/local/apache2/modules are all executable .so files
+If files are not executable with .la extension repeat the installation 
+###############################################################################################
+#Test 
+telnet server_ip@ 80 
+or 
+type http://server_ip@ in web browser 
+###############################################################################################
+#Deployment 
+Copy project in /usr/local/apache2/htdocs
+#Change Document Root in /usr/local/apache2/conf/httpd.conf
+DocumentRoot "Absolute Path to Project Folder"
+###############################################################################################
+# Create Firewall Entry : Firewalld/iptables
+#Iptables
+iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+#Firewalld
+sudo firewall-cmd --zone=public --add-service=http
+##You Can Always Disable Firewalling(Not Recommanded)
+###############################################################################################
+# Enable Apache on Startup 
+touch /etc/rc.d/init.d/apache2 
+chmod 755 apache2 
+echo "
+#!/bin/bash
+#
+# apache2        Startup script for the Apache HTTP Server
+#
+# description: Apache is a World Wide Web server.  It is used to serve \
+#              HTML files and CGI.
+
+/usr/local/apache2/bin/apachectl $@
+" >> apache2
+###############################################################################################
+###############################################################################################
+Appendix A: ARP
+The mission of the Apache Portable Runtime (APR) project is to create and maintain software libraries that provide a predictable and consistent interface to underlying platform-specific implementations. The primary goal is to provide an API to which software developers may code and be assured of predictable if not identical behaviour regardless of the platform on which their software is built, relieving them of the need to code special-case conditions to work around or take advantage of platform-specific deficiencies or features.
+###############################################################################################
+Appendix B: Configure 
+#More Info  https://httpd.apache.org/docs/2.4/programs/configure.html
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--prefix=/usr/local/apache2 : indicate the path where the server will installed.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--enable-mods-shared="all" : compile and install all modules as shared DSO libraries, that way we can easily enable and disable them in the httpd.conf file.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--enable-rewrite 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--with-included-apr
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--enable-so :Can load required modules to apache at run time via the DSO mechanism rather than requiring a recompilation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--enable-ssl:SSL/TLS support
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--with-mpm=prefork 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--enable-file-cache 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--enable-cache 
+--enable-disk-cache 
+--enable-mem-cache 
+--enable-deflate 
+--enable-expires 
+--enable-headers 
+--enable-usertrack 
+--enable-ssl 
+--enable-cgi 
+--enable-vhost-alias 

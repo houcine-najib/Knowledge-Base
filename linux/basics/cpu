@@ -1,0 +1,96 @@
+I- Introdcution
+#
+Although Linux does not interact directly with the CPU, but does through kernel scheduler there is some informatin and setting exposedto user-land.   
+
+Note: All setting are not applicable on Virtual Machine (VM) CPU, also some information may show as "Unknown".
+      In order to check use : dmidecode -s system-product-name
+                              dmidecode -s system-manufacturer
+      One output should clearly indicate if your runing inside a virtual or pyhiscal system.
+II- Hardware
+#
+CPU infos can be collected via:
+
+lscpu         : Max Freq; Min Freq; L1i,L1d,L2,L3 cache; Flags(*)  
+x86info       : x86info -c : TLB info
+/proc/cpuinfo : file
+cpupower      : cpupower -c all frequency-info
+(*) Flags are CPU features,example 1GB page support (HugePage) 
+
+Also the sysfs file system expose some information adn setting in :
+/sys/bus/cpu/devices/cpu{0..n} 
+
+III- CPU Frequency Policy :Governer 
+# Documenation on CPU governers in /usr/share/doc/kernel-doc-<version>/Documenation/cpu-freq/governors.txt
+
+CPU Governer set cpu-freq policy based on frequency limits : scaling_max_freq
+                                                             scaling_min_freq 
+
+These limits(default lspcu values) ,available as files in /sys/bus/cpu/devices/cpu#/cpufreq/ 
+These files are  writable by echoing allowing CPU OC(OverClocking BIOS).
+
+
+
+Available governers can be listed in scaling_available_governors file :
+  
+  powersave   = lowest  frequency within  scaling_min_freq and scaling_max_freq
+  performance = highest frequency within  scaling_min_freq and scaling_max_freq
+  userspace   = set     If supported (*)     frequency in  scaling_setspeed
+  ondemand 
+  conservative 
+
+  cpupower frequency-info --governors
+
+(*) CPU Kernel Drivers don't support all governers (E.g:intel_pstate) to view current driver: 
+    cpupower frequency-info --driver
+    Intel P-State default driver  can be disabled by kernel commandline : intel_pstate=disable (ACPI-CPUFreq Driver)
+
+CPU Governer can be set by echoing into scaling_governor or through : 
+
+x86_energy_perf_policy Energy Perf Bias tool which set energy policy for cpu 
+  x86_energy_perf_policy  -c [cpu] -v 'performance/normal/powersave'
+  x86_energy_perf_policy  -c [cpu] -v  n [0-15] ( 0: max perfomance ;15:max energy efficiency)
+
+cpupower set --perf-bias [0-15] ( 0: max perfomance ;15:max energy efficiency)
+cpupower frequency-set --governor <gov>
+
+echo <gov>  > /sys/bus/cpu/devices/cpu#/cpufreq/scaling_governor 
+
+IV- IRQ (Interrupt Request)
+
+hardware interrupt : CPU receives an interrupt by hardware devices : hardware interrupt 
+software interrupt : called by running process for I/O or by kernel scheduler (kernel timer interrupt) : Kernel Tick 
+
+Kernel Tick: cause kernel interfere with real-time process also waking up idle CPU. 
+To disbale kernel tick interrupt on specified CPUs : 
+
+Set kerenl bootloader commandline : nohz_full=CPU list (/sys/devices/system/cpu/nohz_full)
+
+/proc/interrupts : can be examined to show which interrupts refered by thier number  are firing on which CPUs.
+
+Other system tools can show interrupts statistics.
+
+IRQ Affinity:
+
+To improve application performance assign interrupt affinity and process affinity to the same processor/core,interrupt and applicationthreads to share cache lines. Avoid remote processor handling irq while application on local node.
+
+E.g: To get the best performance from HAProxy, it is important to pin HAProxy and network interrupts on the same physical CPU, but on different cores. This way, they can benefit from the maximum CPU cycles and share the CPU L3 memory.
+
+/proc/irq/<irq_number>/smp_affinity      : CPU bitmask on which the kernel will execute irq handler.
+/proc/irq/<irq_number>/smp_affinity_list : List of CPU on which kernel irq handler allowed to run (, or - for range) 
+smp_affinity bitmask:
+
+On system with more than 32 CPUs , delimite each 32 bit group by comma e.g.: ffffffff,ffffffff refer to ALL CPUs of 64 CPUs
+                                                                             ffffffff,00000000 refer to 32-Last  CPUs of 64 CPUs
+
+Bitmask Calculation :
+HEX { 2^(CPU_Aff_1) + 2^(CPU_Aff_2) ...... + 2^(CPU_Aff_N) }  where CPU_Aff_# : is CPU number to set IRQ affinity to 
+E.g: In order to set CPU affinity of IRQ number 7 to CPUs 0 and 3 : printf '%8x' $[2**0 + 2**3] > /proc/irq/7/smp_affinity 
+
+IRQ-Balance System Daemon :distributes hardware interrupts across processors every 10s (enabled by default)
+/etc/sysconfig/irqbalance : IRQBALANCE_ONESHOT= yes : on startup wait 1 min balance irqs and exit
+                            IRQBALANCE_BANNED_CPUS= : bitmask of CPUs ignored by daemon (E.g:ff000000,00000001 CPU 0,56-63)
+
+Stop and Disable irqbalance service to set irq affinity
+
+systemctl stop irqbalance.service
+systemctl disable irqbalance.service

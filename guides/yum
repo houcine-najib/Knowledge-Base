@@ -1,0 +1,58 @@
+#Create a new Repositry 
+touch /etc/yum.repos.d/new.repo
+echo "
+[ftp]
+name=Remote FTP Repository
+baseurl=ftp://url(file://REPO_PATH)
+enabled=1(0 to disable the repositry)
+gpgcheck=0
+##To enable Integrity Check gpgcheck=1
+                            gpgkey=file://GPG_KEY_Path
+">> /etc/yum.repos.d/new.repo
+#Check New Repositry Creation 
+yum repolist 
+#Create Packages Database for the New Repositry 
+createrepo  -v "Path_to_Repo"
+#Remove Gnome Desktop 
+yum groupremove gnome-desktop
+#Install GNOME Desktop
+yum groupinstall "Server with GUI"
+
+
+/etc/yum.conf
+
+# The proxy server - proxy server:port number
+proxy=http://mycache.mydomain.com:3128
+# The account details for yum connections
+proxy_username=yum-user
+proxy_password=qwerty
+
+
+.bash_profile
+# The Web proxy server, with the username and password for this account
+http_proxy="http://yum-user:password@proxy-server:port"
+https_proxy="https://yum-user:password@proxy-server:port"
+ftp_proxy="ftp://yum-user:password@proxy-server:port"
+
+export http_proxy
+export https_proxy
+export ftp_proxy
+
+
+http://dl.fedoraproject.org/pub/epel/7/x86_64/
+
+
+Start downloading packages with reposync
+Run the command below for each repository (just replace the name “base” with the name of the repository, i.e. updates extras epel). Note that what follows the reposync -p flag is the full path to the directory where you are hosting your repositories.
+
+    $ username=$(whoami)
+    $ nohup reposync -r base -p /run/media/$username/Ext_HD_Volume/Centos7_REPO/ &
+If you’re using an external volume like I am, make sure you change Ext_HD_Volume to the name of your mount point. The nohup utility just runs the reposync with hangup signals ignored, which allows you to continue downloading the repository after logging out. What’s also useful is that (assuming your standard output is a terminal), the command’s standard output will be appended to the file ‘nohup.out’ in the working directory that you ran the command in. If that can’t be written to, it’ll go to $HOME/nohup.out. Thus, we can monitor reposync’s progress downloading our packages with
+
+$ tail -f nohup.out
+5) Create a repomd (xml-based rpm metadata) repository from a set of rpms
+$ cd /run/media/$username/Ext_HD_Volume/Centos7_REPO
+$ createrepo -v base
+Rinse and repeat. Run the last command for all downloaded repositories.
+
+

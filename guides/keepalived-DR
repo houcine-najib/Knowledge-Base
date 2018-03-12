@@ -1,0 +1,181 @@
+
+                                        LB:LVS+Keepalived(DR:Direct Routing)
+                                               VIP:192.168.2.100      
+                                               _________|_________
+                                              |                   |
+                           MASTER --------> LB01                LB02 <-------- BACKUP
+                                       192.168.2.101        192.168.2.102
+                                              |                   |
+                                              |                   |   
+                                              |                   |            
+                                             Web01              Web02 <-------- Real Servers (http port 80)
+                                       192.168.2.201        192.168.2.202
+                                              |___________________|
+                                                                 
+##################################################################################
+On LB01,LB02,WEB01,WEB02
+systemctl stop firewalld 
+systemctl disable firewalld
+##################################################################################
+Keepalived Installation : MASTER & BACKUP
+##################################################################################
+Download keepalived-1.3.2.tar from keepalived.org
+yum -y install gcc
+yum -y install kernel-devel
+yum -y install openssl
+yum -y install openssl-devel
+##################################################################################
+In Keepalive Directory 
+./configure
+make && make install
+##################################################################################
+Edit /usr/lib/systemd/system/keepalived.service File as shown:
+##################################################################################
+[Unit]
+Description=LVS and VRRP High Availability Monitor
+After=syslog.target network-online.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/keepalived.pid
+KillMode=process
+ExecStart=/usr/local/sbin/keepalived -d -n -D
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+##################################################################################
+In MASTER LB Edit /etc/keepalived/keepalived.conf as shown
+##################################################################################
+global_defs {
+   router_id LVS_LAB
+}
+    state MASTER
+    interface eth0
+    virtual_router_id 51
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.2.100/24
+    }
+}
+virtual_server 192.168.2.100 80 {
+    delay_loop 10
+    lb_algo rr
+    lb_kind DR
+    persistence_timeout 5
+    protocol TCP
+    real_server 192.168.2.201 80 {
+       weight 50
+       TCP_CHECK {
+                  connect_timeout 3
+                  nb_get_retry 2
+                  delay_before_retry 3
+                 }
+    }
+    real_server 192.168.2.202 80 {
+       weight 50
+       TCP_CHECK {
+                  connect_timeout 3
+                  nb_get_retry 2
+                  delay_before_retry 3
+                 }
+       }
+}
+##################################################################################
+In BACKUP LB /etc/keepalived/keepalived.conf file
+##################################################################################
+global_defs {
+   router_id LVS_LAB
+}
+vrrp_instance VI_1 {
+    state BACKUP
+    interface eth0
+    virtual_router_id 51
+    priority 50
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.2.100/24
+    }
+}
+virtual_server 192.168.2.100 80 {
+    delay_loop 10
+    lb_algo rr
+    lb_kind DR
+    persistence_timeout 5
+    protocol TCP
+    real_server 192.168.2.201 80 {
+       weight 50
+       TCP_CHECK {
+                  connect_timeout 3
+                  nb_get_retry 2
+                  delay_before_retry 3
+                 }
+    }
+    real_server 192.168.2.202 80 {
+       weight 50
+       TCP_CHECK {
+                  connect_timeout 3
+                  nb_get_retry 2
+                  delay_before_retry 3
+                 }
+       }
+}
+########################################################################################
+In file /etc/sysctl.conf
+net.ipv4.ip_forward = 1
+Reboot or sysctl -p
+########################################################################################
+In /etc/sysconfig/network-scripts/ifcfg-eth0
+TYPE=Ethernet
+BOOTPROTO=none
+DEFROUTE=yes
+NAME=eth0
+DEVICE=eth0
+ONBOOT=yes
+IPADDR=192.168.2.101
+PREFIX=24
+GATEWAY=192.168.2.1
+########################################################################################
+Enable IPVS Kerenel Modules at start-up
+Create file /etc/modules-load.d/ip_vs.conf
+Add the following lines to the file : 
+ip_vs
+ip_vs_dh
+ip_vs_ftp
+ip_vs_lblc
+ip_vs_lblcr
+ip_vs_lc
+ip_vs_nq
+ip_vs_pe_sip
+ip_vs_rr
+ip_vs_sed
+ip_vs_sh
+ip_vs_wlc
+ip_vs_wrr
+########################################################################################
+On Real Servers Edit file /etc/sysctl.conf
+net.ipv4.conf.all.arp_ignore = 1
+net.ipv4.conf.all.arp_announce = 2
+net.ipv4.conf.eth0.arp_ignore = 1
+net.ipv4.conf.eth0.arp_announce = 2
+Reboot or sysctl -p
+Create /etc/sysconfig/network-scripts/ifcfg-eth0:0 for LB VIP (192.168.1.100)
+TYPE=Ethernet
+BOOTPROTO=none
+DEFROUTE=yes
+NAME=eth0:0
+DEVICE=eth0:0
+ONBOOT=yes
+IPADDR=192.168.2.100
+PREFIX=24
+GATEWAY=192.168.2.1
+########################################################################################

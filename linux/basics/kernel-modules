@@ -1,0 +1,24 @@
+# Kernel Modules pluggable modules to extend kernel functionnalties
+# Located in system *.ko.xz
+
+lsmod       : list all loaded module
+insmod      : insert module from file
+modprobe    : load module form available system modules located under /usr/lib/modules/<kernel-version>/kernel
+modprobe -r : unload module with respect to dependencies as for loading
+modinfo     : list module infos : file , dependes ,alias ,license ,paramters
+modinfo  -p : parameters only
+
+# Setting module paramters
+# Method-1 : On loading
+modprobe <modulename> <module_parameter>=<value>
+# Method-2 : At runtime parameter file must be writable
+echo <value> /sys/module/modulena/ne/parameters/parametername
+# Method-3 : Persisent .conf file in /etc/modprobe.d/ directory
+# eg: /etc/modprobe/my_module.conf 
+# Syntax 
+options <module_name> <module_parameter>=<value>
+
+# Built-in Modules : modules that don't have backing file instead complied with the kernel
+# can be listed in /usr/lib/modules/<kernel-version>/modules.builtin file
+modprobe <built-in_module>  : only way to load built-in module
+# Method-2 is the only way to change built-in modules parameters

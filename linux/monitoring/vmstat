@@ -1,0 +1,2 @@
+vmstat -s  : List all statictics since boot
+
