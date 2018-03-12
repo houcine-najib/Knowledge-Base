@@ -19,19 +19,17 @@ Limit*=<soft>:<hard> (1)
 
 # Limits types man systemd.exec
  
-LimitCPU
-LimitFSIZE
-LimitDATA
-LimitSTACK
-LimitCORE
-LimitRSS
-LimitNOFILE
-LimitAS
-LimitNPROC
-LimitMEMLOCK
-LimitLOCKS
-LimitSIGPENDING
-LimitMSGQUEUE
-LimitNICE
-LimitRTPRIO
-LimitRTTIME
+LimitCPU         maximum amount of cpu time (Seconds)
+LimitFSIZE       maximum size of files in written (Bytes)
+LimitDATA        maximum size of a process's data segment (Bytes)
+LimitSTACK       maximum stack size (Bytes)
+LimitCORE        maximum size of core files created (Bytes)
+LimitRSS         maximum resident set size (Bytes)
+LimitNOFILE      maximum  number  of open file descriptors
+LimitAS          maximum amount of virtual memory available (Bytes)
+LimitNPROC       maximum number of processes
+LimitMEMLOCK     maximum size that may be locked into memory (Bytes)
+LimitLOCKS       maximum number of file locks
+LimitNICE        maximum scheduling priority ("nice")
+LimitRTPRIO      maximum real-time scheduling priority
+LimitRTTIME      microseconds 
