@@ -48,12 +48,19 @@ systemclt  restart <unit_name>.<unit_type>
 CPUAccounting    = true/false (true for all units in slice and slice parents)
 CPUShares        = weight of cpu (defaults 1024) at runtime and startup (if StartupCPUShares set)
 StartupCPUShares = weight of cpu on startup only
-CPUQuota         =  % of CPU time (> 100 more than one cpu)
+CPUQuota         = % of CPU time (> 100 more than one cpu)
+
+Nice                     = Nice level (scheduling priority) -20 (highest) ... 19 (lowest)
+CPUAffinity              = Space-Separated list of CPU
+CPUSchedulingPolicy      = other, batch, idle,fifo or rr
+CPUSchedulingPriority    = 1 lowest .. 99 highest (RT Policy)
+CPUSchedulingResetOnFork = Reset CPU Scheduling on process fork
 
 # RAM Configuration for Systemd Unit
 
 MemoryAccounting = true/false (true for all units in slice and slice parents)
 MemoryLimit      = Limit of memory in bytes
+OOMScoreAdjust   = Set Out-Of-Memeory Score -1000 (Disabled)... 1000(High OOM likelihood) 
 
 # Block I/O Configuration for Systemd Unit
 
@@ -63,6 +70,15 @@ StartupBlockIOWeight  = weight (at startup)
 BlockIODeviceWeight   = device (dev path,file path) weight(between 10 & 1000)
 BlockIOReadBandwidth  = device (dev path,file path:backing dev)  bytes (bytes:K,M,G per second) **Buffer Support**
 BlockIOWriteBandwidth = device bytes **No Buffer Support**
+
+# I/O Scheduling Class/Priority : ionice
+# scheduling classes : 
+# idle        = process get I/O only when disk is idle (no priority).
+# best-effort = no specific I/O priority (0..7 same value RoundRobin). 
+# realtime    = process get I/O first access , it can starve other processes (0..7 set time slice on each scheduling window).
+
+IOSchedulingClass     =  0 or none, 1 or realtime, 2 or best-effort, 3 or idle
+IOSchedulingPriority  =  0 : Highest .. 7 Lowest
 
 # Task Configuration for Systemd Unit
 
