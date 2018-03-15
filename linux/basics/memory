@@ -8,7 +8,7 @@ Normal (4GB to end of RAM...)
 
 II- Memory Fragmentation and Compaction
 
-Fragmentation information can be displayed in /proc/buddyinfo file simplified in the below output 
+/proc/buddyinfo expose fragmenetation (simplified output)
 
                Order             0       1      2      3      4      5      6      7      8      9     10 
                Zone 4k Pages     1       2      4      8     16     32     64    128    256    512   1024
@@ -21,12 +21,15 @@ Node 0, zone    DMA32   |    8774    4785   2383   1472   1102    840    606    
 Node 0, zone   Normal   |  147104  336891 113434 136648  72075  29349   9539   3304   1481    727      0 |
 Node 1, zone   Normal   | 1211026 1381111 482960  82119   7636    924    186     83    283      1      0 |
 
-Furthermore /proc/pagetypeinfo file classify these pages by type (Unmovable,Reclaimable,Movable,Reserve,Isolate)
+/proc/pagetypeinfo file classify these pages by type (Unmovable,Reclaimable,Movable,Reserve,Isolate)
+
 Compaction 
 
-III- HugePage and Transparent Huge Pages (THP)
+III- HugePages and Transparent Huge Pages (THP)
 
-THP
+1- HugePages
+
+2- THP
 
 Enable/Disable at Runtime  /sys/kernel/mm/transparent_hugepage/enabled
  always  : enabled 
@@ -44,10 +47,16 @@ Zero Huge Pages /sys/kernel/mm/transparent_hugepage/use_zero_page
 0   : enable
 1   : disable
 
-But to use hugepages effectively, the kernel must find physically continuous areas of memory big enough to satisfy the request,
-and also properly aligned. For this, a khugepaged kernel thread has been added. 
-This thread will occasionally attempt to substitute smaller pages being used currently with a hugepage allocation,
+khugepaged /sys/kernel/mm/transparent_hugepage/khugepaged 
+Kernel thread occasionally attempt to substitute smaller pages being used currently with a hugepage allocation,
 thus maximizing THP usage.
+
+THP usage 
+System-Wide :
+/proc/meminfo label : AnonHugePages since file-based hugepages are not supported
+
+Per Process :
+grep -e AnonHugePages  /proc/*/smaps | awk  '{ if($2>4) print $0} ' |  awk -F "/"  '{print $0; system("ps -fp " $3)} '
 
 IV- SWAP 
 SWAP is disk space used in case of memory pressure to swap-out pages
