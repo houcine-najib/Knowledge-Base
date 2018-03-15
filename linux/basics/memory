@@ -25,17 +25,29 @@ Furthermore /proc/pagetypeinfo file classify these pages by type (Unmovable,Recl
 Compaction 
 
 III- HugePage and Transparent Huge Pages (THP)
-Setting Transparent Huge Pages /sys/kernel/mm/transparent_hugepage/enabled)
+
+THP
+
+Enable/Disable at Runtime  /sys/kernel/mm/transparent_hugepage/enabled
  always  : enabled 
  madvise : disable hugepages system-wide only in madvise regions
  never   : disabled 
- 
-Defragmentation (/sys/kernel/mm/transparent_hugepage/defrag)
+
+Disable at boot
+Kernel commandline : transparent_hugepage=never|always|madvise
+
+Defragmentation /sys/kernel/mm/transparent_hugepage/defrag
 always  : enabled
 madvise : defrag only in madvise regions
 never   : disbaled regular pages served
-/sys/kernel/mm/transparent_hugepage/use_zero_page
+Zero Huge Pages /sys/kernel/mm/transparent_hugepage/use_zero_page
+0   : enable
+1   : disable
 
+But to use hugepages effectively, the kernel must find physically continuous areas of memory big enough to satisfy the request,
+and also properly aligned. For this, a khugepaged kernel thread has been added. 
+This thread will occasionally attempt to substitute smaller pages being used currently with a hugepage allocation,
+thus maximizing THP usage.
 
 IV- SWAP 
 SWAP is disk space used in case of memory pressure to swap-out pages
