@@ -23,7 +23,10 @@ Node 1, zone   Normal   | 1211026 1381111 482960  82119   7636    924    186    
 
 /proc/pagetypeinfo file classify these pages by type (Unmovable,Reclaimable,Movable,Reserve,Isolate)
 
-Compaction 
+Compaction
+All zones can be compacted such that free memory is available in contiguous blocks where possible by:
+
+echo 1 > /proc/sys/vm/compact_memory 
 
 III- HugePages and Transparent Huge Pages (THP)
 
@@ -59,9 +62,12 @@ Per Process :
 grep -e AnonHugePages  /proc/*/smaps | awk  '{ if($2>4) print $0} ' |  awk -F "/"  '{print $0; system("ps -fp " $3)} '
 
 IV- SWAP 
-SWAP is disk space used in case of memory pressure to swap-out pages
- it's better to swap out a program that's been inactive for a while, and instead keep often-used files in cache
- LRU in inactive memory 
+SWAP is disk space used in case of memory pressure to swap-out pages, it can be a paratition or a file
+It's better to swap out a program that's been inactive for a while, and instead keep often-used files in cache (inactive memory).
+
+swapon -s
+
+
  
  
 I- OOM
