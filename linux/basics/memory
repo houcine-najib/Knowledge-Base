@@ -31,6 +31,14 @@ echo 1 > /proc/sys/vm/compact_memory
 III- HugePages and Transparent Huge Pages (THP)
 
 1- HugePages
+/proc/meminfo 
+
+PageTables:       1244880 kB
+HugePages_Total:      0
+HugePages_Free:       0
+Hugepagesize:       2048 kB
+
+
 
 2- THP
 
