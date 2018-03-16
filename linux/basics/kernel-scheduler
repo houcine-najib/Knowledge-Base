@@ -1,12 +1,89 @@
-The switch between different processes is called a context switch,
+I- Context Switch : The switch between different processes the CPU saves all the context information from the old process
+                    and retrieves all the context information for the new process.
 
-because when it happens, the CPU saves all the context information from the old
+Too much context switching is undesirable because the processor has to flush its register and cache 
 
-process and retrieves all the context information for the new process
-
-the context switches are most likely caused by an I/O request or some
-
-other long-running system call (such as a sleep).
-
-Voluentary Context Switch : Requested by the process blocked by I/O
+Voluentary Context Switch     : Requested by the process blocked by I/O
 Non-Voluentary Context Switch : Caused by kernel timer interrupt to schedule another process
+
+II- Scheduling and Preemption
+
+Scheduling of processes on CPU is performed by the kernel scheduler from per-priority runnables threads queues : run queues
+
+Preemption of processes off CPU based on static or dynamic process priority.  
+
+Kernel Preemption support allows high-priority user-level threads to interrupt the kernel and execute.
+
+Timeslice is period for which a process will be running before it is preempted. 
+
+III- Process Priority
+
+Scheduler evalutes process priority in scheduling and preemption.
+
+Static  : defined by user-space thrugh NICE.
+Dynamic : calculated by the kerenl based on policy
+
+IV- Process Types :
+
+CPU Bound : perform heavy compute           : run less frequently for long  time intervals
+I/O Bound : perform I/O with little compute : run very frequently for short time intervals
+
+V- Scheduling Policies :
+
+Completely Fair Scheduler (CFS) is the default Linux kernel scheduler.
+
+CFS contain scheduling classes. These classes are modular and represent scheduling policies
+
+/proc/sched_debug : Scheduler Debugging
+/proc/PID/sched   : Per Process Scheduler Statistics
+ 
+Latency     = Delay between the time a process is scheduled to run and the actual process execution.
+Granularity = ( latency / NORT ) - ( latencty / NORT / NORT ) where NORT : is the number of running tasks.
+
+CFS parameters sysctl or /proc/sys/kernel
+
+sched_latency_ns = 
+
+Real Time Policies:
+
+SCHED_FIFO =  Run until blocked by I/O or preempted by higher-priority process.
+SCHED_RR   =  Round-Robin scheduling policy. Processes at the same priority level are only allowed to run for a maximum time quantum.
+
+Non-Real Time Policies: 
+
+SCHED_OTHER = SCHED_NORMAL default round-robin style  time-sharing scheduling policy (majority of processes).
+SCHED_BATCH = does not pre-empt nearly as often as SCHED_NORMAL does, so the tasks run longer and make better use of caches.
+SCHED_IDLE  = very low priority processes priority lower than nice 19
+
+Scheduling Priorities
+
+           High                   ----->                    Low
+System      0    1     .....               97 98 99
+RT          99  98     .....                2  1
+
+Nice                                -20  -19    ...  0      ...        18  19       
+top         RT -99     ...    -2 -1  0     1    ...  20     ...        38  39
+
+
+Setting or Changing Process Priority : 
+
+nice/renice
+chrt
+tuna (Ref)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

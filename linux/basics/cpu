@@ -68,6 +68,7 @@ Set kerenl bootloader commandline : nohz_full=CPU list (/sys/devices/system/cpu/
 /proc/interrupts : can be examined to show which interrupts refered by thier number  are firing on which CPUs.
 
 Other system tools can show interrupts statistics.
+Interrupts cause context switching.
 
 IRQ Affinity:
 
