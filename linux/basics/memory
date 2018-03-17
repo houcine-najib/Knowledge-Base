@@ -8,7 +8,7 @@ Normal (4GB to end of RAM...)
 
 II- Memory Fragmentation and Compaction
 
-Fragmentation information can be displayed in /proc/buddyinfo file simplified in the below output 
+/proc/buddyinfo expose fragmenetation (simplified output)
 
                Order             0       1      2      3      4      5      6      7      8      9     10 
                Zone 4k Pages     1       2      4      8     16     32     64    128    256    512   1024
@@ -21,26 +21,61 @@ Node 0, zone    DMA32   |    8774    4785   2383   1472   1102    840    606    
 Node 0, zone   Normal   |  147104  336891 113434 136648  72075  29349   9539   3304   1481    727      0 |
 Node 1, zone   Normal   | 1211026 1381111 482960  82119   7636    924    186     83    283      1      0 |
 
-Furthermore /proc/pagetypeinfo file classify these pages by type (Unmovable,Reclaimable,Movable,Reserve,Isolate)
-Compaction 
+/proc/pagetypeinfo file classify these pages by type (Unmovable,Reclaimable,Movable,Reserve,Isolate)
 
-III- HugePage and Transparent Huge Pages (THP)
-Setting Transparent Huge Pages /sys/kernel/mm/transparent_hugepage/enabled)
+Compaction
+All zones can be compacted such that free memory is available in contiguous blocks where possible by:
+
+echo 1 > /proc/sys/vm/compact_memory 
+
+III- HugePages and Transparent Huge Pages (THP)
+
+1- HugePages
+/proc/meminfo 
+
+PageTables:       1244880 kB
+HugePages_Total:      0
+HugePages_Free:       0
+Hugepagesize:       2048 kB
+
+
+
+2- THP
+
+Enable/Disable at Runtime  /sys/kernel/mm/transparent_hugepage/enabled
  always  : enabled 
  madvise : disable hugepages system-wide only in madvise regions
  never   : disabled 
- 
-Defragmentation (/sys/kernel/mm/transparent_hugepage/defrag)
+
+Disable at boot
+Kernel commandline : transparent_hugepage=never|always|madvise
+
+Defragmentation /sys/kernel/mm/transparent_hugepage/defrag
 always  : enabled
 madvise : defrag only in madvise regions
 never   : disbaled regular pages served
-/sys/kernel/mm/transparent_hugepage/use_zero_page
+Zero Huge Pages /sys/kernel/mm/transparent_hugepage/use_zero_page
+0   : enable
+1   : disable
 
+khugepaged /sys/kernel/mm/transparent_hugepage/khugepaged 
+Kernel thread occasionally attempt to substitute smaller pages being used currently with a hugepage allocation,
+thus maximizing THP usage.
+
+THP usage 
+System-Wide :
+/proc/meminfo label : AnonHugePages since file-based hugepages are not supported
+
+Per Process :
+grep -e AnonHugePages  /proc/*/smaps | awk  '{ if($2>4) print $0} ' |  awk -F "/"  '{print $0; system("ps -fp " $3)} '
 
 IV- SWAP 
-SWAP is disk space used in case of memory pressure to swap-out pages
- it's better to swap out a program that's been inactive for a while, and instead keep often-used files in cache
- LRU in inactive memory 
+SWAP is disk space used in case of memory pressure to swap-out pages, it can be a paratition or a file
+It's better to swap out a program that's been inactive for a while, and instead keep often-used files in cache (inactive memory).
+
+swapon -s
+
+
  
  
 I- OOM
