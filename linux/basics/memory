@@ -36,12 +36,20 @@ III- HugePages and Transparent Huge Pages (THP)
 PageTables:       1244880 kB
 HugePages_Total:      0
 HugePages_Free:       0
+HugePages_Rsvd:       0
+HugePages_Surp:       0
 Hugepagesize:       2048 kB
 
+HugePages_Total: Number of hugepages : sysctl vm.nr_hugepages= or /proc/sys/vm/nr_hugepages .
+HugePages_Rsvd : Number of hugepages committed to be allocated by application but no allocation has yet been made.
+                 (Guarantee that an application will be able to allocate a huge page at fault time)
+HugePages_Surp : Number of hugepages surplus above vm.nr_hugepages : /proc/sys/vm/nr_overcommit_hugepages.
+HugePages_Used = HugePages_Total - HugePages_Free 
 
+Note: It’s recommended to restart the system after configuring hugepages as the chances of having free contiguous memory 
+      (for hugepages allocation) is much greater when a system is started
 
 2- THP
-
 Enable/Disable at Runtime  /sys/kernel/mm/transparent_hugepage/enabled
  always  : enabled 
  madvise : disable hugepages system-wide only in madvise regions
@@ -76,8 +84,25 @@ It's better to swap out a program that's been inactive for a while, and instead 
 swapon -s
 
 
- 
- 
-I- OOM
+V- Memory Over Coommitement
+Linux provisions more memory (both RAM and Swap) than it has available. 
+
+overcommitt parameters : sysctl vm.overcommit_memory : /proc/sys/vm/overcommit_memory
+                         sysctl vm.overcommit_ratio  : /proc/sys/vm/overcommit_ratio
+
+vm.overcommit_memory : 
+0 = heuristic overcommit (1/3 ~ 3% of free reserved for root)
+1 = always overcommit 
+2 = strict overcommitd limited by overcommit_ratio. ( CommitLimit in /proc/meminfo) (1/32 ~ 3% of real memory reseverd for root)
+
+vm.overcommit_ratio:
+Memory Allocation Limit = Swap + RAM * (Overcommit Ratio / 100)
+
+Committed_AS in /proc/meminfo : committed address space,an estimate RAM needed to never have OOM
+
+VI- OOM
+
 Out of Memory  killer is kicking in is purely based on the availability of free pages. 
 This could be a page alloc failure from any memory zones
+
+VII- Memory Reclamition
