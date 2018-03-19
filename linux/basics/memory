@@ -93,12 +93,16 @@ overcommitt parameters : sysctl vm.overcommit_memory : /proc/sys/vm/overcommit_m
 vm.overcommit_memory : 
 0 = heuristic overcommit (1/3 ~ 3% of free reserved for root)
 1 = always overcommit 
-2 = strict overcommitd limited by overcommit_ratio. ( CommitLimit in /proc/meminfo) (1/32 ~ 3% of real memory reseverd for root)
+2 = strict overcommit limited by overcommit_ratio. ( CommitLimit in /proc/meminfo) (1/32 ~ 3% of real memory reseverd for root)
 
 vm.overcommit_ratio:
 Memory Allocation Limit = Swap + RAM * (Overcommit Ratio / 100)
 
-Committed_AS in /proc/meminfo : committed address space,an estimate RAM needed to never have OOM
+Committed_AS in /proc/meminfo : committed address space,an estimate RAM needed to never have OOM.
+
+Note: If overcommit_memory = 2 ,always check the overcommit_ratio in case of RAM add or SWAP remove.
+
+Overcommit Ratio = 100 * ((RAM - Swap Space) / RAM)
 
 VI- OOM
 
