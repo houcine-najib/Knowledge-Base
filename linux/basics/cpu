@@ -6,18 +6,37 @@ Note: All setting are not applicable on Virtual Machine (VM) CPU, also some info
       In order to check use : dmidecode -s system-product-name
                               dmidecode -s system-manufacturer
       One output should clearly indicate if your runing inside a virtual or pyhiscal system.
+
 II- Hardware
 #
-CPU infos can be collected via:
+CPU General Info :
 
 lscpu         : Max Freq; Min Freq; L1i,L1d,L2,L3 cache; Flags(*)  
-x86info       : x86info -c : TLB info
+x86info       : 
 /proc/cpuinfo : file
 cpupower      : cpupower -c all frequency-info
+#
 (*) Flags are CPU features,example 1GB page support (HugePage) 
 
-Also the sysfs file system expose some information adn setting in :
-/sys/bus/cpu/devices/cpu{0..n} 
+Also the sysfs file system expose some information adn setting in : /sys/bus/cpu/devices/cpu{0..n} 
+
+CPU Cache Info :
+
+x86info -c    
+
+L1-i (instruction cache)
+L1-d (data cache)
+TLB (Translation Lookaside Buffer)
+L2  
+L3 
+
+CPU Performance Counters:
+
+CPU cycles
+CPU instructions
+L1,L2,L3 cache accesses: hits, misses
+
+Refer to : perf,valgrind,oprofile,turbostat             
 
 III- CPU Frequency Policy :Governer 
 # Documenation on CPU governers in /usr/share/doc/kernel-doc-<version>/Documenation/cpu-freq/governors.txt
@@ -60,17 +79,18 @@ IV- IRQ (Interrupt Request)
 hardware interrupt : CPU receives an interrupt by hardware devices : hardware interrupt 
 software interrupt : called by running process for I/O or by kernel scheduler (kernel timer interrupt) : Kernel Tick 
 
-Kernel Tick: cause kernel interfere with real-time process also waking up idle CPU. 
-To disbale kernel tick interrupt on specified CPUs : 
+Kernel Tick: cause kernel interfere (interrupt/context switch) with real-time process also waking up idle CPU. 1000 ticks/s
 
-Set kerenl bootloader commandline : nohz_full=CPU list (/sys/devices/system/cpu/nohz_full)
+To reduce tick interrupt on idle CPUs : set kernel parameter nohz=on
+To disbale kernel tick interrupt on specified CPUs : 
+Set kerenl bootloader commandline : nohz_full=CPU list (/sys/devices/system/cpu/nohz_full) 1 tick/s
 
 /proc/interrupts : can be examined to show which interrupts refered by thier number  are firing on which CPUs.
 
 Other system tools can show interrupts statistics.
 Interrupts cause context switching.
 
-IRQ Affinity:
+V- IRQ Affinity:
 
 To improve application performance assign interrupt affinity and process affinity to the same processor/core,interrupt and applicationthreads to share cache lines. Avoid remote processor handling irq while application on local node.
 
@@ -95,3 +115,48 @@ Stop and Disable irqbalance service to set irq affinity
 
 systemctl stop irqbalance.service
 systemctl disable irqbalance.service
+
+VI- CPU Affinity:
+
+Pining process to cpu or cpu affinity of process.
+
+taskset -c <comma,spearte-dash range cpu> -- <command> 
+taskset -c <comma,spearte-dash range cpu> -- <pid>
+
+Notes: taskset is not NUMA-aware.
+       systemd cpu affinity is preferred on taskset.
+
+CPU Affinity for  kernel threads
+ 
+write-back bdi-flush :  /sys/bus/workqueue/devices/writeback/cpumask
+
+watchdog             : /proc/sys/kernel/watchdog_cpumask
+
+RCU : 
+Kernel  parameters
+rcu_nocbs=cpulist to allow the user to move all RCU offload threads to a housekeeping CPU.
+rcu_nocb_poll to relieve each CPU from the responsibility awakening their RCU offload threads.
+Tuna
+tuna -t rcu* -c <cpu_number> -m
+Taskset
+for i in `pgrep rcu[^c]` ; do taskset -pc <cpu_number> $i ; done
+
+VII- CPU Isolation
+
+To isolate cpus from scheduler use 
+
+kernel commandline: isolcpus= <comma,spearte-dash range cpu>
+or tuna (not the same behaviour) 
+
+
+
+
+
+
+
+
+
+
+
+
+

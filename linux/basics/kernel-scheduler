@@ -40,14 +40,37 @@ CFS contain scheduling classes. These classes are modular and represent scheduli
 Latency     = Delay between the time a process is scheduled to run and the actual process execution.
 Granularity = ( latency / NORT ) - ( latencty / NORT / NORT ) where NORT : is the number of running tasks.
 
-CFS parameters sysctl or /proc/sys/kernel
+CFS parameters : sysctl or /proc/sys/kernel
 
-sched_latency_ns = 
+sched_latency_ns             = delay between process scheduling and execution
+                             = scheduler run a task  from the queue once  during the epoch 
+                             = sched_min_granularity_ns * number_of_running_tasks : if too many tasks on system (*)
+                               (*) number_of_runnable_tasks > sched_latency_ns/sched_min_granularity_ns
+
+sched_min_granularity_ns     = granularity of sched_latency_ns  
+
+sched_wakeup_granularity_ns  = wake-up preemption,ability for woken tasks with higher pririty to preemt current running task
+                               High : reduces wake-up preemption, reducing disturbance of compute bound tasks.
+                               Lower: improves wake-up latency and throughput for latency critical tasks.
+sched_migration_cost_ns      =  If the real run time of the task is less than this value, 
+                                then the scheduler will assume that it is still in cache and
+                                will try to avoid moving the task to another CPU.
+                                Reduce: if high CPU idle with runnable tasks
+                                Increase: if tasks bounce between CPUs/Nodes too often
+
+sched_rt_period_us           = period over which real-time tasks measured. Default: 1,000,000 µs                         
+sched_rt_runtime_us          = quantum allocated to real-time tasks during sched_rt_period_us (-1 disabled). Default: 950,000 µs 
+
+sched_rt_period_us - sched_rt_runtime_us = time for non-real time tasks.
+
+sched_rr_timeslice_ms        = round robin time quanta for SCHED_RR tasks 
 
 Real Time Policies:
 
 SCHED_FIFO =  Run until blocked by I/O or preempted by higher-priority process.
 SCHED_RR   =  Round-Robin scheduling policy. Processes at the same priority level are only allowed to run for a maximum time quantum.
+
+Both SCHED_FIFO and SCHED_RR may be used concurrently for different running processes.
 
 Non-Real Time Policies: 
 
@@ -57,19 +80,62 @@ SCHED_IDLE  = very low priority processes priority lower than nice 19
 
 Scheduling Priorities
 
+Total of 140 priorities :
+
+nice       -20 (highest) .. 19 (lowest) 
+real-time   1  (lowest)  .. 99 (highest) 
+user-space  100          .. 139 
+
+top
+#
+NI     = niceness level  (user-space) -19 .. 20
+PR     = kernel-space priority rt:process under RT policies 
+
+ps
+#
+RTPRIO = Real-Time Priority : 1 .. 99
+NI     = -19 .. 20
+PRI    = 100 .. 139
+
+PR     = 20 + NI 
+       = 0 .. 39
+       = 100 .. 139 ( RT 1 .. 99)
+       = PRI 
+
+Summary :
+
            High                   ----->                    Low
-System      0    1     .....               97 98 99
-RT          99  98     .....                2  1
+
+RT          99  98     .....   2  1
 
 Nice                                -20  -19    ...  0      ...        18  19       
 top         RT -99     ...    -2 -1  0     1    ...  20     ...        38  39
+ps          99  98     ...     2  1 100   101   ...  120    ...       138  139
+
 
 
 Setting or Changing Process Priority : 
 
-nice/renice
-chrt
-tuna (Ref)
+Non-Real Time : nice/renice  
+
+nice -n <-20..19> <command> 
+renice  <-20..19> <PID>
+
+Real-Time     : chrt          
+
+chrt -m = minimum and maximum valid priorities for each scheduling algorithm.
+
+chrt <scheduler> <priority> <command>
+
+-b = SCHED_BATCH
+-f = SCHED_FIFO
+-i = SCHED_IDLE
+-o = SCHED_OTHER
+-r = SCHED_RR     = DEFAULT (if <scheduler> not set)
+
+chrt -p  <scheduler> <priority> <PID>
+
+Note: tuna (Ref)
 
 
 
