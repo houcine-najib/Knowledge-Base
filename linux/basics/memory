@@ -46,10 +46,17 @@ HugePages_Rsvd : Number of hugepages committed to be allocated by application bu
 HugePages_Surp : Number of hugepages surplus above vm.nr_hugepages : /proc/sys/vm/nr_overcommit_hugepages.
 HugePages_Used = HugePages_Total - HugePages_Free 
 
-Note: It’s recommended to restart the system after configuring hugepages as the chances of having free contiguous memory 
-      (for hugepages allocation) is much greater when a system is started
+In order to set hugepages  : sysctl -w vm.nr_hugepages=xx or vm.nr_hugepages=xx in /etc/sysctl.conf at boot time
+      
+Note: Restart the system after configuring hugepages for chances of having free contiguous memory.
+
+Kernel commandline  : hugepages= 
+                      hugepagesz= 2MB default /hardware dependent
+mmap ( hugetlbfs )
+shmat,shmget 
 
 2- THP
+
 Enable/Disable at Runtime  /sys/kernel/mm/transparent_hugepage/enabled
  always  : enabled 
  madvise : disable hugepages system-wide only in madvise regions
@@ -71,6 +78,7 @@ Kernel thread occasionally attempt to substitute smaller pages being used curren
 thus maximizing THP usage.
 
 THP usage 
+
 System-Wide :
 /proc/meminfo label : AnonHugePages since file-based hugepages are not supported
 
