@@ -30,6 +30,8 @@ TLB (Translation Lookaside Buffer)
 L2  
 L3 
 
+getconf -a 
+
 CPU Performance Counters:
 
 CPU cycles
