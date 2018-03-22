@@ -23,6 +23,15 @@ Node 1, zone   Normal   | 1211026 1381111 482960  82119   7636    924    186    
 
 /proc/pagetypeinfo file classify these pages by type (Unmovable,Reclaimable,Movable,Reserve,Isolate)
 
+/proc/zoneinfo 
+
+Physical memory available in MB:
+echo $(($(getconf _PHYS_PAGES) * $(getconf PAGE_SIZE) / (1024 * 1024)))
+
+Virtual memory available in MB:
+echo $(($(getconf _AVPHYS_PAGES) * $(getconf PAGE_SIZE) / (1024 * 1024)))
+
+
 Compaction
 All zones can be compacted such that free memory is available in contiguous blocks where possible by:
 
@@ -185,6 +194,9 @@ ipcmk : create shared memory segment (-M), a semaphore (-S), or a message queue 
 ipcs  : list shared memory segment (-m), a semaphore (-s), or a message queue (-q)
         list limits (-l)
 ipcrm : remove shared memory segment (-m), a semaphore (-s), or a message queue (-q)
+
+kernel.threads-max
+system-wide maximum number of threads  to be used by the kernel at one time.
 
 
 
