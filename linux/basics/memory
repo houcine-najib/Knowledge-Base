@@ -85,12 +85,30 @@ System-Wide :
 Per Process :
 grep -e AnonHugePages  /proc/*/smaps | awk  '{ if($2>4) print $0} ' |  awk -F "/"  '{print $0; system("ps -fp " $3)} '
 
-IV- SWAP 
-SWAP is disk space used in case of memory pressure to swap-out pages, it can be a paratition or a file
+IV- SWAP
+
+SWAP is disk space used in case of memory pressure to swap-out pages, it can be a partition or a file
 It's better to swap out a program that's been inactive for a while, and instead keep often-used files in cache (inactive memory).
 
 swapon -s
+Filename  Type            Size       Used Priority
+/dev/sdd  partition/file   KB        -1(Default) ... 32767 (Highest) 
 
+Note: two swap space with same priority treated in round-robin way increasing swap performance.
+
+Create SWAP partition
+
+1) fdisk /dev/sdd ; n : create partition ; t : change partition system id to 82 (Linux swap / Solaris)
+2) mkswap /dev/sdd 
+3) swapon /dev/sdd -p 1 
+4) add entries in /etc/fstab : /dev/sdd swap swap sw,pri=1 0 0
+5) turn off all swap space : swapoff -a
+6) mounts all swap spaces in /etc/fstab : swapon -a 
+
+Create SWAP file
+1) dd if=/dev/zero of=/tmp/swap_file bs=1024 count=1048576
+2) mkswap /tmp/swap_file
+3) swapon /tmp/swap_file
 
 V- Memory Over Coommitement
 Linux provisions more memory (both RAM and Swap) than it has available. 
@@ -118,3 +136,6 @@ Out of Memory  killer is kicking in is purely based on the availability of free 
 This could be a page alloc failure from any memory zones
 
 VII- Memory Reclamition
+
+VIII- IPC
+
