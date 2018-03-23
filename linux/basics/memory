@@ -23,6 +23,15 @@ Node 1, zone   Normal   | 1211026 1381111 482960  82119   7636    924    186    
 
 /proc/pagetypeinfo file classify these pages by type (Unmovable,Reclaimable,Movable,Reserve,Isolate)
 
+/proc/zoneinfo 
+
+Physical memory available in MB:
+echo $(($(getconf _PHYS_PAGES) * $(getconf PAGE_SIZE) / (1024 * 1024)))
+
+Virtual memory available in MB:
+echo $(($(getconf _AVPHYS_PAGES) * $(getconf PAGE_SIZE) / (1024 * 1024)))
+
+
 Compaction
 All zones can be compacted such that free memory is available in contiguous blocks where possible by:
 
@@ -85,12 +94,39 @@ System-Wide :
 Per Process :
 grep -e AnonHugePages  /proc/*/smaps | awk  '{ if($2>4) print $0} ' |  awk -F "/"  '{print $0; system("ps -fp " $3)} '
 
-IV- SWAP 
-SWAP is disk space used in case of memory pressure to swap-out pages, it can be a paratition or a file
+IV- SWAP
+
+SWAP is disk space used in case of memory pressure to swap-out pages, it can be a partition or a file
 It's better to swap out a program that's been inactive for a while, and instead keep often-used files in cache (inactive memory).
 
 swapon -s
+Filename  Type            Size       Used Priority
+/dev/sdd  partition/file   KB        -1(Default) ... 32767 (Highest) 
 
+Note: two swap space with same priority treated in round-robin way increasing swap performance.
+
+Create SWAP partition
+
+1) fdisk /dev/sdd ; n : create partition ; t : change partition system id to 82 (Linux swap / Solaris)
+2) mkswap /dev/sdd 
+3) swapon /dev/sdd -p 1 
+4) add entries in /etc/fstab : /dev/sdd swap swap sw,pri=1 0 0
+5) turn off all swap space : swapoff -a
+6) mounts all swap spaces in /etc/fstab : swapon -a 
+
+Create SWAP file
+1) dd if=/dev/zero of=/tmp/swap_file bs=1024 count=1048576
+2) mkswap /tmp/swap_file
+3) swapon /tmp/swap_file
+
+Control SWAPINESS
+Degree to which the system favors anonymous memory or the page cache.
+
+vm.swappiness=<0..100> /proc/sys/vm/swappiness (Default 60)
+
+swappiness=0      aggressively avoids swapping out (increases OOM risk under strong memory and I/O pressure).
+swappiness=<high> aggressively swapping less active processes out of physical memory.
+swappiness=<low>  avoids swapping processes out of memory (decreases latency).
 
 V- Memory Over Coommitement
 Linux provisions more memory (both RAM and Swap) than it has available. 
@@ -118,3 +154,49 @@ Out of Memory  killer is kicking in is purely based on the availability of free 
 This could be a page alloc failure from any memory zones
 
 VII- Memory Reclamition
+
+VIII- IPC
+
+Inter-Process-Communication are mechanisms provided by the kernel to allow processes to communicate with each other.
+
+These are the six primary IPC mechanisms available:
+
+1- Sockets       : Unix Domain Socket(NETLINK ,NETWORK) TCP/IP or UDP sockets to exchange data over the sockets.
+2- Pipes         : pipe is used for one way communication of a stream of bytes.
+3- Shared Memory : allows one process to share a region of memory in its address space with another. (fastest no  kernel intervention)
+4- Semaphores    : locking and synchronization mechanism used most widely when processes share resources.
+5- Message Queues: one or more processes can write messages, which can in turn be read by one or more reading processes.
+6- Signals       : used to signal asynchronous events to one or more processes (oldest IPC used by Unix systems)
+
+Redhat has 3 methods : Shared Memory, Semaphores, and Message Queues.
+
+kernel parameter
+Shared Memory
+kernel.shmmax  : /proc/sys/kernel/shmmax : the max allowable size of one shared memory segment in bytes
+kernel.shmmni  : /proc/sys/kernel/shmmni : the max number of shared memory segments in the entire system
+kernel.shmall  : /proc/sys/kernel/shmall : the max size of shared memory in pages (one page = 4096 bytes for x86/x86_64)
+
+Semaphore
+kernel.sem     : /proc/sys/kernel/sem	<SEMMSL> <SEMMNS> <SEMOPM> <SEMMNI>
+SEMMSL	the max number of semaphores per identifier
+SEMMNS	the max value of a semaphore
+SEMOPM	the max number of operations per semaphore call
+SEMMNI	the max number of semaphore sets in the entire system
+
+Message Queue
+kernel.msgmni /proc/sys/kernel/msgmni	: the number of message queue identifiers
+kernel.msgmax /proc/sys/kernel/msgmnb	: the default max size of a message queue in bytes
+kernel.msgmnb /proc/sys/kernel/msgmax	: the max size of a message in bytes
+
+ipcmk, ipcs, ipcrm : tools to manuapilite System V interprocess communication (IPC)
+
+ipcmk : create shared memory segment (-M), a semaphore (-S), or a message queue (-Q)
+ipcs  : list shared memory segment (-m), a semaphore (-s), or a message queue (-q)
+        list limits (-l)
+ipcrm : remove shared memory segment (-m), a semaphore (-s), or a message queue (-q)
+
+kernel.threads-max
+system-wide maximum number of threads  to be used by the kernel at one time.
+
+
+

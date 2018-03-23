@@ -1,6 +1,7 @@
-I- Context Switch : The switch between different processes the CPU saves all the context information from the old process
-                    and retrieves all the context information for the new process.
+I- Context Switch 
 
+The switch between different processes the CPU saves all the context information from the old process 
+and retrieves all the context information for the new process.
 Too much context switching is undesirable because the processor has to flush its register and cache 
 
 Voluentary Context Switch     : Requested by the process blocked by I/O
@@ -20,7 +21,7 @@ III- Process Priority
 
 Scheduler evalutes process priority in scheduling and preemption.
 
-Static  : defined by user-space thrugh NICE.
+Static  : defined by user-space through NICE.
 Dynamic : calculated by the kerenl based on policy
 
 IV- Process Types :
