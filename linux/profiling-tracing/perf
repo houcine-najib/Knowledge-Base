@@ -1,0 +1,26 @@
+perf a collection of tools for profiling and tracing,called Linux Performance Events (LPE). Each tool is selected as a subcommand.
+
+perf Subcommands
+
+annotate      Read perf.data (created by perf record) and display annotated code.
+diff          Read two perf.data files and display the differential profile.
+evlist        List the event names in a perf.data file.
+inject        Filter to augment the events stream with additional information.
+kmem          Tool to trace/measure kernel memory (slab) properties.
+kvm           Tool to trace/measure kvm guest OS.
+list          List all symbolic event types.
+lock          Analyze lock events.
+probe         Define new dynamic tracepoints.
+record        Run a command and record its profile into perf.data.
+report        Read perf.data (created by perf record) and display the profile.
+sched         Tool to trace/measure scheduler properties (latencies).
+script        Read perf.data (created by perf record) and display trace output.
+stat          Run a command and gather performance counter statistics.
+timechart     Tool to visualize total system behavior during a workload.
+top           System profiling tool.
+
+Examples : 
+# Kernel Tick
+perf stat -C 1 -e irq_vectors:local_timer_entry taskset -c 1 stress -t 1 -c 1
+# cache stat 
+perf stat -e cache-misses cache_program

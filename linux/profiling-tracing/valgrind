@@ -1,0 +1,18 @@
+valgrind: a memory debugging and profiling toolkit 
+
+Tools list :
+
+memcheck   : default
+cachegrind : analyze hardware cache and branch-prediction
+callgrind  : trace function calls and gather a call graph visualized using kcachegrind.
+
+Help 
+
+valgrind --tool=<tool> -h
+
+Example:
+# analyze cache 
+valgrind --tool=cachegrind cache_program
+
+# detect memory leak
+valgrind --tool=memcheck  --leak-check=full leak_prgram

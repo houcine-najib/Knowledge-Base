@@ -1,0 +1,13 @@
+sosreport tool to collect system profile including hardware profile.
+
+Hardware Profile : 
+dmidecode : dmidecode -s or /sys/class/dmi/id
+            dmidecode -t 
+dmesg
+lspci
+lsusb
+
+sosreport -l  : list of plugins (enabled/disbaled)
+/etc/sos.conf : configuration file (disbale plugins)
+sosreport     : generate tarball report in /var/tmp/
+
