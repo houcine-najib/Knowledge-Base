@@ -9,6 +9,10 @@ Each CPU has a dedicated area of memory combained referred to as NUMA  Node.
 Example : per node hugepages   : cat /sys/devices/system/node/*/hugepages/hugepages-2048kB/*
           NUMA stat            : cat /sys/devices/system/node/*/numastat
           per node memory info : cat /sys/devices/system/node/*/meminfo
+          
+Node Distance : hardcoded values set by motherboard manufacturer exposed to OS by ACPI to determine the relative distance
+between any 2 NUMA nodes 
+Distances range from 10 (fastest) to 254 (25.4 slower) 255 for no NUMA connection.
 
 numastat    tool for  memory statistics on a per-NUMA-node basis. 
            ⁠numa_hit       : number of pages that were successfully allocated to this node.
