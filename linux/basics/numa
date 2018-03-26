@@ -31,43 +31,22 @@ numastat -p <PID> or <pattern> :  per-node process memory usage (in MBs) for <PI
 N u mact l lets administrators run a process with a specified scheduling or memory placement policy.
 N u mact l can also set a persistent policy for shared memory segments or files, and set the processor
 affinity and memory affinity of a process.
-N u mact l provides a number of useful options. This appendix outlines some of these options and
-gives suggestions for their use, but is not exhaustive.
-⁠- - h ard ware
-D isplays an inventory of available nodes on the system, including relative distances
-between nodes.
-⁠- - memb in d
+
+⁠-- hardware : inventory of available nodes on the system, including relative distances between nodes.
+⁠-- membind  : 
 Ensures that memory is allocated only from specific nodes. If there is insufficient memory
 available in the specified location, allocation fails.
-⁠- - cp u n o d eb in d
+⁠-- cpunodebind
 Ensures that a specified command and its child processes execute only on the specified
 node.
-⁠- - p h ycp u b in d
+⁠-- phycpubind
 Ensures that a specified command and its child processes execute only on the specified
 processor.
-⁠- - lo calallo c
+⁠-- localalloc
 Specifies that memory should always be allocated from the local node.
-⁠- - p ref erred
+⁠-- preferred
 Specifies a preferred node from which to allocate memory. If memory cannot be allocated
 from this specified node, another node will be used as a fallback.
-
-
-
-numactl --hardware : nodes topology
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -105,17 +84,7 @@ n u mad provides a pre-placement advice service that can be queried by various j
 systems to provide assistance with the initial binding of CPU and memory resources for their
 processes. This pre-placement advice is available regardless of whether n u mad is running as an
 executable or a service.
-A.14 .4 . Using numad wit h KSM
-If KSM is in use on a NUMA system, change the value of the /sys/kernel /mm/ksm/merg e_no d es
-parameter to 0 to avoid merging pages across NUMA nodes. Otherwise, KSM increases remote
-memory accesses as it merges pages across nodes. Furthermore, kernel memory accounting
-73
-Performance T uning G uide
-statistics can eventually contradict each other after large amounts of cross-node merging. As such,
-numad can become confused about the correct amounts and locations of available memory, after the
-KSM daemon merges many memory pages. KSM is beneficial only if you are overcommitting the
-memory on your system. If your system has sufficient free memory, you may achieve higher
-performance by turning off and disabling the KSM daemon.
+
 
 
 
