@@ -19,10 +19,12 @@ Timeslice is period for which a process will be running before it is preempted.
 
 III- Process Priority
 
-Scheduler evalutes process priority in scheduling and preemption.
+Scheduler evalutes non-realtime process priority in scheduling and preemption.
 
 Static  : defined by user-space through NICE.
-Dynamic : calculated by the kerenl based on policy
+Dynamic : calculated by the kerenl based on policy.
+
+realtime prcoess have static priority which always higher than non-realtime ones.
 
 IV- Process Types :
 
@@ -78,6 +80,8 @@ Non-Real Time Policies:
 SCHED_OTHER = SCHED_NORMAL default round-robin style  time-sharing scheduling policy (majority of processes).
 SCHED_BATCH = does not pre-empt nearly as often as SCHED_NORMAL does, so the tasks run longer and make better use of caches.
 SCHED_IDLE  = very low priority processes priority lower than nice 19
+
+Note: threads with this policy are considered to have a realtime priority of 0 .
 
 Scheduling Priorities
 
@@ -137,20 +141,4 @@ chrt <scheduler> <priority> <command>
 chrt -p  <scheduler> <priority> <PID>
 
 Note: tuna (Ref)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

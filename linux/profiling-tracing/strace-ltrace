@@ -1,12 +1,13 @@
 strace : system call tracing per process
 strace <command>             : trace command
-strace -p <PID>              : trace process
-strace -c <command>/-p <PID> : count system calls
-strace -e <system_call>      : filter a system call
-strace -f <command>/-p <PID> : follow child processes
+strace -p    <PID>              : trace process
+strace -c    <command>/-p <PID> : count system calls
+strace -e    <system_call>      : filter a system calls 
+strace -f    <command>/-p <PID> : follow child processes
+starce -T    <command>/-p <PID> : print time of  system call
+starce -tt  <command>/-p <PID>  : print time (ms) 
 
 ltrace : library call tracing tool
-
 ltrace <command>             : trace command
 ltrace -p <PID>              : trace process
 ltrace -c <command>/-p <PID> : count library calls

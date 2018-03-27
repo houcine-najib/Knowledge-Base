@@ -14,7 +14,7 @@ Node Distance : hardcoded values set by motherboard manufacturer exposed to OS b
 between any 2 NUMA nodes 
 Distances range from 10 (fastest) to 254 (25.4 slower) 255 for no NUMA connection.
 
-numastat    tool for  memory statistics on a per-NUMA-node basis. 
+numastat : tool for  memory statistics on a per-NUMA-node basis. 
            ⁠numa_hit       : number of pages that were successfully allocated to this node.
 ⁠           numa_miss      : number of pages that were allocated on this node because of low memory on the intended node.
 ⁠           numa_foreign   : number of pages initially intended for this node that were allocated to another node instead. 
@@ -26,65 +26,23 @@ numastat -m                    : cat /sys/devices/system/node/*/meminfo
 numastat -p <PID> or <pattern> :  per-node process memory usage (in MBs) for <PID> or list of process <pattern> 
 
 
+numactl  : set the processor affinity and memory affinity of a process.
 
+⁠--hardware    = inventory of available nodes on the system, including relative distances between nodes.
+ --membind     = process allocate memory from specific node.           Syntax: numactl --membind=<nodes> <process> 
+⁠--cpunodebind = process and childs execute only on the specified node.Syntax: numactl --cpunodebind=<nodes> <process>
+⁠--phycpubind  = process and childs execute only on the specified CPU .Syntax: numactl --phycpubind=<cpus> <process>
+⁠--localalloc  = process  memory should always be allocated from the local node.
+⁠--preferred   = preferred node from which to allocate memory.
+ --show        = current process NUMA policy.
+ 
+numad        NUMA affinity management daemon.
+               = -i time interval that numad waits between system scans,default 15s.
+                 with systemd unit interval can be changed in /etc/numad.conf
 
-N u mact l lets administrators run a process with a specified scheduling or memory placement policy.
-N u mact l can also set a persistent policy for shared memory segments or files, and set the processor
-affinity and memory affinity of a process.
-
-⁠-- hardware : inventory of available nodes on the system, including relative distances between nodes.
-⁠-- membind  : 
-Ensures that memory is allocated only from specific nodes. If there is insufficient memory
-available in the specified location, allocation fails.
-⁠-- cpunodebind
-Ensures that a specified command and its child processes execute only on the specified
-node.
-⁠-- phycpubind
-Ensures that a specified command and its child processes execute only on the specified
-processor.
-⁠-- localalloc
-Specifies that memory should always be allocated from the local node.
-⁠-- preferred
-Specifies a preferred node from which to allocate memory. If memory cannot be allocated
-from this specified node, another node will be used as a fallback.
-
-
-
-To use n u mad as an executable, just run:
-# numad
-While n u mad runs, its activities are logged in /var/l o g /numad . l o g . It will run until stopped with
-the following command:
-72
-⁠Appendix A. T ool Reference
-# numad -i 0
-Stopping n u mad does not remove the changes it has made to improve NUMA affinity. If system use
-changes significantly, running n u mad again will adjust affinity to improve performance under the
-new conditions.
-To restrict n u mad management to a specific process, start it with the following options.
-# numad -S 0 -p pid
-⁠- p pid
-This option adds the specified pid to an explicit inclusion list. The process specified will not
-be managed until it meets the n u mad process significance threshold.
-⁠- S 0
-This sets the type of process scanning to 0 , which limits n u mad management to explicitly
-included processes.
-For further information about available n u mad options, refer to the n u mad man page:
-$ man numad
-A.14 .2. Using numad as a service
-While n u mad runs as a service, it attempts to tune the system dynamically based on the current
-system workload. Its activities are logged in /var/l o g /numad . l o g .
-To start the service, run:
-# systemctl start numad.service
-To make the service persist across reboots, run:
-# chkconfig numad on
-For further information about available n u mad options, refer to the n u mad man page:
-$ man numad
-A.14 .3. Pre-placement advice
-n u mad provides a pre-placement advice service that can be queried by various job management
-systems to provide assistance with the initial binding of CPU and memory resources for their
-processes. This pre-placement advice is available regardless of whether n u mad is running as an
-executable or a service.
-
+numad -i 0          = stop numad (does not remove changes).
+numad -S 0 -p <PID> = restrict numad to process with PID.(-p <PID-n>)
+numad -S 1          = scan all system processes except exclusion list.
 
 
 
