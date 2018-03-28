@@ -1,0 +1,9 @@
+tee  : copy standard input to fiel, and also to standard output.
+
+tee  -a --append              
+     -i --ignore-interrupts 
+
+Exmaple : 
+vmstat 1 100 | tee -ai /tmp/vmstat.log
+
+
