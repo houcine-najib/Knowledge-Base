@@ -152,145 +152,25 @@ VI- OOM
 Out of Memory  killer is kicking in is purely based on the availability of free pages. 
 This could be a page alloc failure from any memory zones
 
-⁠o o m_ad j
-In the event that the system runs out of memory and the panic_on_oom parameter is set to
-0 , the o o m_ki l l er function kills processes until the system can recover, starting from the
-process with the highest o o m_sco re.
-The oom_adj parameter helps determine the oom_score of a process. This parameter is
-set per process identifier. A value of -17 disables the o o m_ki l l er for that process. Other
-valid values are from -16 to 15.
+vm.panic_on_oom = enables/disables oom_killer.
+                = 0 enabled
+                = 1 kernel panic 
+                = 2 kernel panic for cgroups (+kdump)
 
-panic_on_oom
+vm.oom_kill_allocating_task = specify task to for oom_kill 
+                            = 0 heuristic : rogue memory-hogging task
+                            = non-zero    : oom triggered task
 
-This enables or disables panic on out-of-memory feature.
+/proc/<PID>/oom_score     : OOM score ,the higher value the likely <PID> OOM killer.(kernel and systemd are immune)
 
-If this is set to 0, the kernel will kill some rogue process,
-called oom_killer.  Usually, oom_killer can kill rogue processes and
-system will survive.
+/proc/<PID>/oom_adj       : determine oom score = -17     disbale oom_killer
+                                                =   0     no change (default)  
+                                                = -16..15 multiply oom_score * 2 ^ oom_adj
 
-If this is set to 1, the kernel panics when out-of-memory happens.
-However, if a process limits using nodes by mempolicy/cpusets,
-and those nodes become memory exhaustion status, one process
-may be killed by oom-killer. No panic occurs in this case.
-Because other nodes' memory may be free. This means system total status
-may be not fatal yet.
+/proc/<PID>/oom_score_adj : adjust oom score (add the value) 
+                            -1000 ... 1000
 
-If this is set to 2, the kernel panics compulsorily even on the
-above-mentioned. Even oom happens under memory cgroup, the whole
-system panics.
-
-The default value is 0.
-1 and 2 are for failover of clustering. Please select either
-according to your policy of failover.
-panic_on_oom=2+kdump gives you very strong tool to investigate
-why oom happens. You can get snapshot.
-
-
-oom_kill_allocating_task
-
-This enables or disables killing the OOM-triggering task in
-out-of-memory situations.
-
-If this is set to zero, the OOM killer will scan through the entire
-tasklist and select a task based on heuristics to kill.  This normally
-selects a rogue memory-hogging task that frees up a large amount of
-memory when killed.
-
-If this is set to non-zero, the OOM killer simply kills the task that
-triggered the out-of-memory condition.  This avoids the expensive
-tasklist scan.
-
-If panic_on_oom is selected, it takes precedence over whatever value
-is used in oom_kill_allocating_task.
-
-The default value is 0.
-
-
-
-
-
-
-
-
-When a minor page fault happens, but there are no free pages available, the kernel tries to
-
-reclaim memory to satisfy the request. If it cannot reclaim sufficient memory in a timely manner,
-
-an out-of-memory condition occurs.
-
-By default, a subsystem called the Out-of-Memory Killer (or "OOM killer") will select and kill one
-
-or more processes to free memory so that the request can be satisfied. As an alternative, if the
-
-sysctl tunable vm.panic_on_oom is set to 1instead of 0, the kernel will panic instead.
-
-Note
-
-Once the system has reached a point where it has an out-of-memory condition, there
-
-are not many reasonable options for recovery. Killing a process to free memory, giving
-
-up and killing the system, or deadlock are all possible choices. In general, it is best to
-
-avoid allowing the system to get into an out-of-memory condition if at all possible.
-
-To determine which process the OOM killer should kill, the kernel keeps a running badness
-
-score for every process, which can be viewed in /proc/PJD/oom_score. The higher the score
-
-the more likely the process will be killed by the OOM killer. A number of factors are used to
-
-calculate this score: the VM-size (not RSS size), the cumulative VM size of any children the
-
-process has, nice values (positive nice values give a higher score), total runtime (a longer total
-
-RH442-RHEL7-en-1-20150128 243
-
-Chapter 9.Tuning the Server for Large Memory Workload
-
-runtime will reduce the score), running user (root processes get a slight protection), and if the
-
-process performs direct hardware access, the score is lowered as well. The kernel itself and PID 1
-
-(systemd)are immune from the OOM killer.
-
-Two tunables, /proc/PID/oom_adj and /proc/PI0/oom_score_adj can be used to
-
-manually adjust oom_score.
-
-oom _adj can take values from -17 to 15 where 0 means no change (the default), -17 means
-
-immunity (never kill) and any other value will be used to modify oom_score by multiplying
-
-oom score with 2oom_adj. Therefore, setting a positive oom_adj value makes a process more
-
-likely to be killed, while setting a negative value reduces the chances of being terminated by the
-
-kernel.
-
-Similarly, values put into oom_score_adj are also added to the oom_score.However, the
-
-mechanism for using oom_score_adj is different than oom_adj.oom_score_jadj can be
-
-set to values ranging from -1000 to 1000. When a value is put into oom _score_adj that
-
-value is added to the oom_score.No odd mathematical adjustment is applied. The value in
-
-oom_score_adj is simply added to oom_score.
-
-Note
-
-To force the OOM killer to start, execute echo f > /proc/sysrq -trigger, but
-
-remember that at least one process will be killed. Output will be sent to dmesg.
-
-
-
-
-
-
-
-
+force the OOM killer      :  echo f > /proc/sysrq -trigger highest oom_score process will be killed.
 
 VII- Memory Reclamition
 

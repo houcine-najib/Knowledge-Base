@@ -15,12 +15,12 @@ between any 2 NUMA nodes
 Distances range from 10 (fastest) to 254 (25.4 slower) 255 for no NUMA connection.
 
 numastat : tool for  memory statistics on a per-NUMA-node basis. 
-           ⁠numa_hit       : number of pages that were successfully allocated to this node.
-⁠           numa_miss      : number of pages that were allocated on this node because of low memory on the intended node.
-⁠           numa_foreign   : number of pages initially intended for this node that were allocated to another node instead. 
-            interleave_hit : number of interleave policy pages successfully allocated to this node.
-⁠           local_node     : number of pages successfully allocated on this node, by a process on this node.
-⁠           other_node     : number of pages allocated on this node, by a process on another node.
+	    numa_hit       : number of pages that were successfully allocated to this node.
+	    numa_miss      : number of pages that were allocated on this node because of low memory on the intended node.
+	    numa_foreign   : number of pages initially intended for this node that were allocated to another node instead. 
+	    interleave_hit : number of interleave policy pages successfully allocated to this node.
+	    local_node     : number of pages successfully allocated on this node, by a process on this node.
+	    other_node     : number of pages allocated on this node, by a process on another node.
 
 numastat -m                    : cat /sys/devices/system/node/*/meminfo
 numastat -p <PID> or <pattern> :  per-node process memory usage (in MBs) for <PID> or list of process <pattern> 
@@ -28,12 +28,12 @@ numastat -p <PID> or <pattern> :  per-node process memory usage (in MBs) for <PI
 
 numactl  : set the processor affinity and memory affinity of a process.
 
-⁠--hardware    = inventory of available nodes on the system, including relative distances between nodes.
+ --hardware    = inventory of available nodes on the system, including relative distances between nodes.
  --membind     = process allocate memory from specific node.           Syntax: numactl --membind=<nodes> <process> 
-⁠--cpunodebind = process and childs execute only on the specified node.Syntax: numactl --cpunodebind=<nodes> <process>
-⁠--phycpubind  = process and childs execute only on the specified CPU .Syntax: numactl --phycpubind=<cpus> <process>
-⁠--localalloc  = process  memory should always be allocated from the local node.
-⁠--preferred   = preferred node from which to allocate memory.
+ --cpunodebind = process and childs execute only on the specified node.Syntax: numactl --cpunodebind=<nodes> <process>
+ --phycpubind  = process and childs execute only on the specified CPU .Syntax: numactl --phycpubind=<cpus> <process>
+ --localalloc  = process  memory should always be allocated from the local node.
+ --preferred   = preferred node from which to allocate memory.
  --show        = current process NUMA policy.
  
 numad        NUMA affinity management daemon.

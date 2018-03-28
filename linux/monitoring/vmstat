@@ -1,2 +1,46 @@
-vmstat -s  : List all statictics since boot
+vmstat  : virtula memory statistics
+
+vmstat -s              : list all statictics since boot
+vmstat [delay [count]] : output each delay seconds for count times. 
+vmstat -n              : remove periodic headers.
+vmstat -a              : print active/inactive memory.
+vmstat -p <partition>  : print disk partition device stats.
+vmstat -d <disk>       : print disk stats.(-D suumary)
+vmstat -m              : print slabinfo.
+vmstat -w              : wide output.
+
+procs -----------------------memory---------------------- ---swap-- -----io---- -system-- --------cpu--------
+ r  b         swpd         free         buff        cache   si   so    bi    bo   in   cs  us  sy  id  wa  st
+
+procs  r:    number of runnable processes .
+       b:    number of blocked  processes in uninterruptible sleep.
+memory swpd: the amount of virtual memory used.
+swap   si:   memory swapped in from disk (/s).
+       so:   memory swapped to disk (/s).
+io     bi:   blocks received from disk (blocks/s).
+       bo:   blocks sent to disk (blocks/s).
+system in:   number of interrupts per second.
+       cs:   number of context switches per second.
+cpu    us:   % running non-kernel code : user time
+       sy:   % running kernel code     : system time
+       id:   % idle. 
+       wa:   % waiting for io
+       st:   % stolen from a virtual machine.
+
+disk- ------------reads------------ ------------writes----------- -----IO------
+       total merged sectors      ms  total merged sectors      ms    cur    sec
+disk   total:   total reads/writes completed successfully
+       merged:  grouped reads.writes (resulting in one I/O)
+       sectors: sectors read successfully
+       ms:      milliseconds spent reading/writing
+       cur:     I/O in progress
+       s:       seconds spent for I/O
+
+SLAB
+Cache                       Num  Total   Size  Pages
+     cache:  cache name
+     num:    number of currently active objects
+     total:  total number of available objects
+     size:   size of each object
+     pages:  number of pages with at least one active object
 
