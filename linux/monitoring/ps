@@ -1,2 +1,3 @@
 ps : process status
+ps [-o etime,time,pcpu,command] [-u user] [-U user] [PID]
 

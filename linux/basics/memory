@@ -212,6 +212,7 @@ ipcmk, ipcs, ipcrm : tools to manuapilite System V interprocess communication (I
 ipcmk : create shared memory segment (-M), a semaphore (-S), or a message queue (-Q)
 ipcs  : list shared memory segment (-m), a semaphore (-s), or a message queue (-q)
         list limits (-l)
+        list pids   (-p)
 ipcrm : remove shared memory segment (-m), a semaphore (-s), or a message queue (-q)
 
 kernel.threads-max : system-wide maximum number of threads at one time.
