@@ -1,0 +1,22 @@
+                        EXT4             XFS        BTRFS
+
+Indexing Algorithm      Hash B-tree      B+tree     Modified B-tree
+Max volume size         1 Ebytes         8 Ebytes   16 Ebytes
+Max file size           16 Tbytes        8 Ebytes   16 Ebytes
+Max number of files     4 billion        2^64       2^64
+Max file name size      255 bytes        255 bytes  255 bytes
+Transparent compression No               No         Yes
+Transparent encryption  Yes              No         Planned
+Copy-on-Write (COW)     No               Planned    Yes
+Snapshots               No               Planned    Yes
+
+Extent        : an extent is a contiguous group of blocks. 
+Journaling    : records changes to the file system so that in the event of a system crash
+Copy-on-Write : file system does not overwrite existing blocks.
+Scrubbing     : asynchronously reads all data blocks and verifies checksums
+
+df -hT 
+findmnt
+lsblk -f
+/etc/mtab /etc/mtab is list of currently mounted filesystem
+/proc/mounts
