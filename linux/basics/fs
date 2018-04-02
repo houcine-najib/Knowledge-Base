@@ -6,6 +6,9 @@ Extent        : an extent is a contiguous group of blocks.
 Journaling    : writes journal logs in journal area before writing actual user data to the file system.
 Copy-on-Write : file system does not overwrite existing blocks.
 Scrubbing     : asynchronously reads all data blocks and verifies checksums
+Barriers      :
+⁠Access Time   :
+Read-ahead    : pre-fetching data that is likely to be read and loading it into the page cache.
 
 II- FS  Tuning 
 #
@@ -40,7 +43,7 @@ df      -aTh      : list all filesystems with type and usage Bytes (-i for inode
 findmnt -a        : tree list all mounted filesytems or search for a filesystem.
 lsblk   -af       : list all block devices and corresponding mount points.
 #
-⁠B arriers
+⁠Barriers
 File system barriers ensure that file system metadata is correctly written and ordered on
 persistent storage, and that data transmitted with fsync persists across a power outage.
 On previous versions of Red Hat Enterprise Linux, enabling file system barriers could
@@ -57,19 +60,27 @@ not required, you can mount the file system with the no ati me mount option. Thi
 updates to metadata when a file is read. It also enables no d i rati me behavior, which
 disables updates to metadata when a directory is read.
 
-⁠R ead- ah ead
-Read-ahead behavior speeds up file access by pre-fetching data that is likely to be needed
-soon and loading it into the page cache, where it can be retrieved more quickly than if it
-were on disk. The higher the read-ahead value, the further ahead the system pre-fetches
-data.
 
 
 #
 1) Ext4
+# Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/ext4.txt
+/sys/fs/ext4/<disk>
+Format Options :
+mk2fs : -n = dry-run formatting paratition
+        -N = specify inode size (Default 256)
 
+Mount Options :
+noatime
+This feature disables registering a file access time.
 
+data=writeback
+This feature allows metadata to be written asynchronously from the corresponding data.
+
+barrier=0
 2) XFS
-
+# Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
+/sys/fs/xfs/<disk>
 
 IV- Comparison of FS
  
