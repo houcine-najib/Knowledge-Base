@@ -1,3 +1,78 @@
+I- Concepts                        
+#
+VFS           : virtual file system interface provides a common interface for different file system types.
+Inode         : index node containi metadata for a file system object(permissions,timestamps, data pointers).
+Extent        : an extent is a contiguous group of blocks.
+Journaling    : writes journal logs in journal area before writing actual user data to the file system.
+Copy-on-Write : file system does not overwrite existing blocks.
+Scrubbing     : asynchronously reads all data blocks and verifies checksums
+
+II- FS  Tuning 
+#
+1) VFS
+# Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/sysctl/fs.txt and vm.txt
+fs.file-max   (/proc/sys/fs/file-max)   = maximum number of file-handles the kernel will allocate.
+fs.nr_open    (/proc/sys/fs/nr_open)    = maximum number of file-handles a process can allocate.
+fs.aio-max-nr (/proc/sys/fs/aio-max-nr) = maximum number of asynchronous io requests system-wide.
+
+vm.drop_caches (/proc/sys/vm/drop_caches) = 1 : free pagecache
+                                          = 2 : free dentries and inodes
+                                          = 3 : free pagecache, dentries and inodes
+
+vm.vfs_cache_pressure (/proc/sys/vm/cache_pressure) = controls kernel directory and inode objects caching tendency.
+                                                    = 100  : fair rate cache/reclaim
+                                                    = <100 : perfer cache
+                                                    = 0    : always cache
+                                                    = >100 : perfer reclaim
+2) XFS  
+# Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
+fs.xfs.xfssyncd_centisecs   (Min: 100 Default:3000 Max:720000) interval at which the xfssyncd thread flushes metadataout to disk.
+fs.xfs.xfsbufd_centisecs    (Min: 50  Default:100  Max:3000)   interval at which xfsbufd scans the dirty metadata buffers list.
+fs.xfs.age_buffer_centisecs (Min: 100 Default:1500 Max:720000) age at which xfsbufd flushes dirty metadata buffers to disk.
+
+III- Format and Mount Options
+# 
+/proc/filesystems : all filesystems registered to the kernel ( nodev : without persistent storage device)
+/proc/mounts      : list of all currently mounted filesystem (/proc/mtab).
+/proc/fstab       : list of all mounts entries.
+#
+df      -aTh      : list all filesystems with type and usage Bytes (-i for inode usage).    
+findmnt -a        : tree list all mounted filesytems or search for a filesystem.
+lsblk   -af       : list all block devices and corresponding mount points.
+#
+⁠B arriers
+File system barriers ensure that file system metadata is correctly written and ordered on
+persistent storage, and that data transmitted with fsync persists across a power outage.
+On previous versions of Red Hat Enterprise Linux, enabling file system barriers could
+significantly slow applications that relied heavily on fsync, or created and deleted many
+small files
+
+⁠Access T ime
+Every time a file is read, its metadata is updated with the time at which access occurred
+(ati me). This involves additional write I/O. In most cases, this overhead is minimal, as by
+default Red Hat Enterprise Linux 7 updates the ati me field only when the previous access
+time was older than the times of last modification (mti me) or status change (cti me).
+However, if updating this metadata is time consuming, and if accurate access time data is
+not required, you can mount the file system with the no ati me mount option. This disables
+updates to metadata when a file is read. It also enables no d i rati me behavior, which
+disables updates to metadata when a directory is read.
+
+⁠R ead- ah ead
+Read-ahead behavior speeds up file access by pre-fetching data that is likely to be needed
+soon and loading it into the page cache, where it can be retrieved more quickly than if it
+were on disk. The higher the read-ahead value, the further ahead the system pre-fetches
+data.
+
+
+#
+1) Ext4
+
+
+2) XFS
+
+
+IV- Comparison of FS
+ 
                         EXT4             XFS        BTRFS
 
 Indexing Algorithm      Hash B-tree      B+tree     Modified B-tree
@@ -10,13 +85,3 @@ Transparent encryption  Yes              No         Planned
 Copy-on-Write (COW)     No               Planned    Yes
 Snapshots               No               Planned    Yes
 
-Extent        : an extent is a contiguous group of blocks. 
-Journaling    : records changes to the file system so that in the event of a system crash
-Copy-on-Write : file system does not overwrite existing blocks.
-Scrubbing     : asynchronously reads all data blocks and verifies checksums
-
-df -hT 
-findmnt
-lsblk -f
-/etc/mtab /etc/mtab is list of currently mounted filesystem
-/proc/mounts
