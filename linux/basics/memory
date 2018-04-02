@@ -144,11 +144,9 @@ Memory Allocation Limit = Swap + RAM * (Overcommit Ratio / 100)
 Committed_AS in /proc/meminfo : committed address space,an estimate RAM needed to never have OOM.
 
 Note: If overcommit_memory = 2 ,always check the overcommit_ratio in case of RAM add or SWAP remove.
-
 Overcommit Ratio = 100 * ((RAM - Swap Space) / RAM)
 
 VI- OOM
-
 Out of Memory  killer is kicking in is purely based on the availability of free pages. 
 This could be a page alloc failure from any memory zones
 
@@ -162,22 +160,26 @@ vm.oom_kill_allocating_task = specify task to for oom_kill
                             = non-zero    : oom triggered task
 
 /proc/<PID>/oom_score     : OOM score ,the higher value the likely <PID> OOM killer.(kernel and systemd are immune)
-
 /proc/<PID>/oom_adj       : determine oom score = -17     disbale oom_killer
                                                 =   0     no change (default)  
                                                 = -16..15 multiply oom_score * 2 ^ oom_adj
-
 /proc/<PID>/oom_score_adj : adjust oom score (add the value) 
                             -1000 ... 1000
-
 force the OOM killer      :  echo f > /proc/sysrq -trigger highest oom_score process will be killed.
 
 VII- Memory Reclamition
+#
+1) Buffer :
 
+vm.dirty_expire_centisecs    : age in 1/100th of a sec the dirty pages must be before flushing to disk.
+vm.dirty_writeback_centisecs : kernel BDI-flush thread frequency
+vm.dirty_background_ratio    : % dirty memory before sync.
+vm.dirty_ratio               : % dirty memory before block all writes IO and sync.
+
+2) Cache :
+See fs
 VIII- IPC
-
 Inter-Process-Communication are mechanisms provided by the kernel to allow processes to communicate with each other.
-
 These are the six primary IPC mechanisms available:
 
 1- Sockets       : Unix Domain Socket(NETLINK ,NETWORK) TCP/IP or UDP sockets to exchange data over the sockets.
@@ -216,6 +218,3 @@ ipcs  : list shared memory segment (-m), a semaphore (-s), or a message queue (-
 ipcrm : remove shared memory segment (-m), a semaphore (-s), or a message queue (-q)
 
 kernel.threads-max : system-wide maximum number of threads at one time.
-
-
-
