@@ -6,8 +6,7 @@ Extent        : an extent is a contiguous group of blocks.
 Journaling    : writes journal logs in journal area before writing actual user data to the file system.
 Copy-on-Write : file system does not overwrite existing blocks.
 Scrubbing     : asynchronously reads all data blocks and verifies checksums
-Barriers      :
-⁠Access Time   :
+Barriers      : enforce proper on-disk ordering of journal commits, making volatile disk write caches safe to use
 Read-ahead    : pre-fetching data that is likely to be read and loading it into the page cache.
 
 II- FS  Tuning 
@@ -46,29 +45,37 @@ lsblk   -af       : list all block devices and corresponding mount points.
 ⁠Barriers
 File system barriers ensure that file system metadata is correctly written and ordered on
 persistent storage, and that data transmitted with fsync persists across a power outage.
-On previous versions of Red Hat Enterprise Linux, enabling file system barriers could
-significantly slow applications that relied heavily on fsync, or created and deleted many
-small files
-
-⁠Access T ime
-Every time a file is read, its metadata is updated with the time at which access occurred
-(ati me). This involves additional write I/O. In most cases, this overhead is minimal, as by
-default Red Hat Enterprise Linux 7 updates the ati me field only when the previous access
-time was older than the times of last modification (mti me) or status change (cti me).
-However, if updating this metadata is time consuming, and if accurate access time data is
-not required, you can mount the file system with the no ati me mount option. This disables
-updates to metadata when a file is read. It also enables no d i rati me behavior, which
-disables updates to metadata when a directory is read.
 
 
 
-#
 1) Ext4
 # Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/ext4.txt
 /sys/fs/ext4/<disk>
-Format Options :
+
+# Configurations in /etc/mke2fs.conf
 mk2fs : -n = dry-run formatting paratition
         -N = specify inode size (Default 256)
+        -b = block size : 1024,2048 or 4096
+        -i = inode for every bytes-per-inode bytes 
+        -I = inode size in bytes (Default 256)
+        -E = stride       =stride-size
+             stripe_width =stripe-width
+             discard :              (disbale nodiscard)
+            
+        -J = size   = internel journal size in MB
+             device = device of external journal (also label or uuid)
+        -O = journal_dev <external-journal> : create externel journal. 
+
+2) XFS
+# Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
+/sys/fs/xfs/<disk>
+
+
+
+
+
+
+
 
 Mount Options :
 noatime
@@ -78,9 +85,6 @@ data=writeback
 This feature allows metadata to be written asynchronously from the corresponding data.
 
 barrier=0
-2) XFS
-# Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
-/sys/fs/xfs/<disk>
 
 IV- Comparison of FS
  
