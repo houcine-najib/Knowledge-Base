@@ -70,21 +70,21 @@ Note: Number of disks in RAID is calculated : RAID 0  --> N
 2) XFS
 # Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
 /sys/fs/xfs/<disk>
+xfs_info <device>
+xfs_io -x -c "resblks" <mnt>
 mkfs.xfs : -b : size=<bytes> filesystem block size (min 512,default 4kB,max 64KB )
            -d : agcount= number of allocation groups (number of CPUs)
                 agsize=<bytes> size of allocation group ( min 16 MB, max 1 TB)
                 sunit  = stripe unit (chunk-size/block size) of RAID array in 512-byte block / su in bytes
                 swidth = stripe width of RAID array in 512-byte block (number of disks in raid * 512 )/ sw = number of disks in raid
-           -i :
+           -i : size   = inode size in bytes (default 256 ,max 2048)
+                maxpct = max % allocted to inode (default 25% <1TB, 5% <50TB,1% > 50TB)
            -l : internal = 1 internel log device,0 external log device
                 logdev   = device for filesystem log
                 size     = size of log in bytes(*b in blocks)
                 sunit/su = same as for data
            -n : size= directory block size in bytes (for many small files : 64KB for >1,000,000 entries)
            
-
-
-
 Mount Options :
 
 Defaults mount options are : rw, suid, dev, exec, auto, nouser, and async
