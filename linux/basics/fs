@@ -52,8 +52,8 @@ mk2fs : -n = dry-run formatting paratition
         -b = block size : 1024,2048 or 4096
         -i = inode for every bytes-per-inode bytes 
         -I = inode size in bytes (Default 256)
-        -E : stride       =stride-size RAID chunk-size 
-             stripe_width =stripe-width
+        -E : stride       =stride-size RAID chunk-size / Block Size
+             stripe_width =stripe-width (Number of disks * stride)
              discard :  discard blocks at mkfs (disbale nodiscard) 
         -J : size   = internel journal size in MB
              device = device of external journal (also label or uuid)
@@ -61,19 +61,27 @@ mk2fs : -n = dry-run formatting paratition
              <feature>                      : override filesystem default features (/etc/mke2fs.conf)
         -T : usage type (small,big ....)
 tune2fs : can be used to adjust most of these parameters (may need to be unmounted)
-  
+
+Note: Number of disks in RAID is calculated : RAID 0  --> N
+                                              RAID 1  --> N/2
+                                              RAID 5  --> N-1
+                                              RAID 10 --> N/2
+      Stride size = [RAID chunk size] / [Filesystem block size]
 2) XFS
 # Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
 /sys/fs/xfs/<disk>
-mkfs.xfs : -b : size=<bytes> block size (min 512,default 4kB,max 64KB )
+mkfs.xfs : -b : size=<bytes> filesystem block size (min 512,default 4kB,max 64KB )
            -d : agcount= number of allocation groups (number of CPUs)
                 agsize=<bytes> size of allocation group ( min 16 MB, max 1 TB)
-                sunit  = stripe unit (chunk-size) of RAID array in 512-byte block / su in bytes
-                swidth = stripe width of RAID array in 512-byte block / sw in bytes
+                sunit  = stripe unit (chunk-size/block size) of RAID array in 512-byte block / su in bytes
+                swidth = stripe width of RAID array in 512-byte block (number of disks in raid * 512 )/ sw = number of disks in raid
            -i :
-           -l : 
-
-
+           -l : internal = 1 internel log device,0 external log device
+                logdev   = device for filesystem log
+                size     = size of log in bytes(*b in blocks)
+                sunit/su = same as for data
+           -n : size= directory block size in bytes (for many small files : 64KB for >1,000,000 entries)
+           
 
 
 
