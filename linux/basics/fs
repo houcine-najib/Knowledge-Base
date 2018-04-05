@@ -52,7 +52,7 @@ mk2fs : -n = dry-run formatting paratition
         -b = block size : 1024,2048 or 4096
         -i = inode for every bytes-per-inode bytes 
         -I = inode size in bytes (Default 256)
-        -E = stride       =stride-size RAID chunk size 
+        -E = stride       =stride-size RAID chunk-size 
              stripe_width =stripe-width
              discard :  discard blocks at mkfs (disbale nodiscard) 
         -J = size   = internel journal size in MB
@@ -60,11 +60,12 @@ mk2fs : -n = dry-run formatting paratition
         -O = journal_dev <external-journal> : create externel journal. 
              <feature>                      : override filesystem default features (/etc/mke2fs.conf)
         -T = usage type (small,big ....)
-
+tune2fs : can be used to adjust most of these parameters (may need to be unmounted)
+  
 2) XFS
 # Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
 /sys/fs/xfs/<disk>
-
+mkfs.xfs : -l 
 
 
 
@@ -73,6 +74,11 @@ mk2fs : -n = dry-run formatting paratition
 
 
 Mount Options :
+
+Defaults mount options are : rw, suid, dev, exec, auto, nouser, and async
+
+Note: Filesystems has specific mount options. Example: for extended filesystem family defaults mount options can be listed by : tune2fs -l <paratition>
+
 noatime
 This feature disables registering a file access time.
 

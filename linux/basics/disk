@@ -1,4 +1,13 @@
-Hardware
-Disk IO Scheduler : Elvator
-Linux supports io scheduling priorities and classes since 2.6.13 with the CFQ io scheduler.
+I- Hardware
 
+II- Disk IO Scheduler : Elvator
+
+1) CFQ
+Linux supports io scheduling priorities and classes since 2.6.13 with the CFQ io scheduler.
+2) deadline
+3) noop
+
+
+III- Benchmarking 
+bonnie++
+hdparm
