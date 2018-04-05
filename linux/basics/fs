@@ -52,22 +52,26 @@ mk2fs : -n = dry-run formatting paratition
         -b = block size : 1024,2048 or 4096
         -i = inode for every bytes-per-inode bytes 
         -I = inode size in bytes (Default 256)
-        -E = stride       =stride-size RAID chunk-size 
+        -E : stride       =stride-size RAID chunk-size 
              stripe_width =stripe-width
              discard :  discard blocks at mkfs (disbale nodiscard) 
-        -J = size   = internel journal size in MB
+        -J : size   = internel journal size in MB
              device = device of external journal (also label or uuid)
-        -O = journal_dev <external-journal> : create externel journal. 
+        -O : journal_dev <external-journal> : create externel journal. 
              <feature>                      : override filesystem default features (/etc/mke2fs.conf)
-        -T = usage type (small,big ....)
+        -T : usage type (small,big ....)
 tune2fs : can be used to adjust most of these parameters (may need to be unmounted)
   
 2) XFS
 # Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
 /sys/fs/xfs/<disk>
-mkfs.xfs : -l 
-
-
+mkfs.xfs : -b : size=<bytes> block size (min 512,default 4kB,max 64KB )
+           -d : agcount= number of allocation groups (number of CPUs)
+                agsize=<bytes> size of allocation group ( min 16 MB, max 1 TB)
+                sunit  = stripe unit (chunk-size) of RAID array in 512-byte block / su in bytes
+                swidth = stripe width of RAID array in 512-byte block / sw in bytes
+           -i :
+           -l : 
 
 
 
