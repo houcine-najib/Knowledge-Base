@@ -25,7 +25,7 @@ bonnie++ -c 4 -n 10000:512k:4k:1000:64k  -d /bench_dir -b -x 3 -u root | bon_csv
 #
 Exmaple : read/write entire magnetic once and output to file 
 
-zcav -l zcav.out  -c1 -f /dev/sda
+zcav -c 1 -f /dev/sda -l zcav.out
 
 3) hdparm
 
