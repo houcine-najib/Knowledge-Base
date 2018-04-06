@@ -13,7 +13,7 @@ Example : per node hugepages   : cat /sys/devices/system/node/*/hugepages/hugepa
 Node Distance : hardcoded values set by motherboard manufacturer exposed to OS by ACPI to determine the relative distance
 between any 2 NUMA nodes 
 Distances range from 10 (fastest) to 254 (25.4 slower) 255 for no NUMA connection.
-
+#
 numastat : tool for  memory statistics on a per-NUMA-node basis. 
 	    numa_hit       : number of pages that were successfully allocated to this node.
 	    numa_miss      : number of pages that were allocated on this node because of low memory on the intended node.
@@ -24,8 +24,7 @@ numastat : tool for  memory statistics on a per-NUMA-node basis.
 
 numastat -m                    : cat /sys/devices/system/node/*/meminfo
 numastat -p <PID> or <pattern> :  per-node process memory usage (in MBs) for <PID> or list of process <pattern> 
-
-
+#
 numactl  : set the processor affinity and memory affinity of a process.
 
  --hardware    = inventory of available nodes on the system, including relative distances between nodes.
@@ -35,14 +34,23 @@ numactl  : set the processor affinity and memory affinity of a process.
  --localalloc  = process  memory should always be allocated from the local node.
  --preferred   = preferred node from which to allocate memory.
  --show        = current process NUMA policy.
- 
-numad        NUMA affinity management daemon.
+#
+NUMA Load Balancing : 
+#
+sysctl kernel.numa_balancing=enable/disable ( enabled by default : /proc/sys/kernel/numa_balancing) 
+kernel boot commandline : numa_balancing=enable/disable
+kernel boot commandline : numa=off (completly disbale numa)
+#
+numad        NUMA affinity management daemon dynamically improve NUMA resource allocation.
                = -i time interval that numad waits between system scans,default 15s.
-                 with systemd unit interval can be changed in /etc/numad.conf
+                  with systemd unit interval can be changed in /etc/numad.conf
+Note: numad disbale numa load balancing
 
 numad -i 0          = stop numad (does not remove changes).
 numad -S 0 -p <PID> = restrict numad to process with PID.(-p <PID-n>)
 numad -S 1          = scan all system processes except exclusion list.
+
+
 
 
 
