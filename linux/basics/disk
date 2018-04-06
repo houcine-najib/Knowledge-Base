@@ -1,5 +1,10 @@
 I- Hardware
 
+fdisk -l  : list all disks and paratitions (/proc/paratitions)
+lsblk -a  : list all block devices.
+lsblk -pt : list topology of all devices.
+lsblk -S  : list all iSCSi devices.
+
 II- Disk IO Scheduler : Elvator
 
 1) CFQ
@@ -9,5 +14,20 @@ Linux supports io scheduling priorities and classes since 2.6.13 with the CFQ io
 
 
 III- Benchmarking 
-bonnie++
-hdparm
+1) bonnie++ 
+#
+Exmaple :
+Run 4 concurent test on directory /bench_dir with 10,000 random size files between 4KB and 512KB , while flushing buffer(fsync) and repeat benchamrk 3 times
+#
+bonnie++ -c 4 -n 10000:512k:4k:1000:64k  -d /bench_dir -b -x 3 -u root | bon_csv2html > benchamrk.html
+#
+2) zcav
+#
+Exmaple : read/write entire magnetic once and output to file 
+
+zcav -l zcav.out  -c1 -f /dev/sda
+
+3) hdparm
+
+
+
