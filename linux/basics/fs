@@ -57,7 +57,7 @@ mk2fs : -n = dry-run formatting paratition
              discard :  discard blocks at mkfs (disbale nodiscard) 
         -J : size   = internel journal size in MB
              device = device of external journal (also label or uuid)
-        -O : journal_dev <external-journal> : create externel journal. 
+        -O : journal_dev <external-journal> : create externel journal prior to mounting. 
              <feature>                      : override filesystem default features (/etc/mke2fs.conf)
         -T : usage type (small,big ....)
 tune2fs : can be used to adjust most of these parameters (may need to be unmounted)
@@ -105,15 +105,22 @@ diratime/nodiratime = disbale directory access time update
                                
 Note: Filesystems has specific mount options. 
 Example: for extended filesystem family defaults mount options can be listed by : tune2fs -l <paratition>
-
+#
 1) Ext4
-mount -t ext4 -o 
-
-data=writeback
-This feature allows metadata to be written asynchronously from the corresponding data.
-
-
+#
+mount -t ext4 -o    journal_path/journal_dev    = external journal path/device (major/minor)
+                    journal_ioprio = 0..7 (lowest;default 3) 
+                    data           = journal   = metadata written prior to its data written into the main filesystem
+                                     ordered   = data written prior to its metadata commited to journal (default mode)
+                                     writeback = metadata written asynchronously from the corresponding data (highest-throughput)
+                    barrier=1/barrier=0 = barrier/nobarrier|
+                    stripe              = number of RAID disks * chunk size  
+                    norecovery/noload  
+                    discard/nodiscard
+                    commit              = sync all data and metadata every nrsec seconds (default 5s)
+          
 2) XFS
+#
 mount -t xfs -o  barrier|nobarrier = enable/disbale barriers (default enabled)
                  discard|nodiscard = discard free blocks     (default no;fstrim)
                  inode32|inode64   = 32/64 bits inode        (default 64)
@@ -122,8 +129,7 @@ mount -t xfs -o  barrier|nobarrier = enable/disbale barriers (default enabled)
                  logdev            = log device 
                  norecovery        = mount read-only without log recovery
                  sunit/swidth      = stripe unit/stripe width
-
-
+#
 V- Fragmentation
 
 1) Ext4
