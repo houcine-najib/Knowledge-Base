@@ -90,9 +90,9 @@ mkfs.xfs : -b : size=<bytes> filesystem block size (min 512,default 4kB,max 64KB
 IV- Mount Options :
 #
 1) Generic Options
-
+#
 defaults mount options are : rw, suid, dev, exec, auto, nouser, and async
-
+#
 rw/ro
 auto/noauto         = mount explicitly
 async/sync          = I/O synchronously
@@ -113,6 +113,7 @@ mount -t ext4 -o    journal_path/journal_dev    = external journal path/device (
                     data           = journal   = metadata written prior to its data written into the main filesystem
                                      ordered   = data written prior to its metadata commited to journal (default mode)
                                      writeback = metadata written asynchronously from the corresponding data (highest-throughput)
+                                     kernel boot commandline : rootflags=data=<mode>
                     barrier=1/barrier=0 = barrier/nobarrier|
                     stripe              = number of RAID disks * chunk size  
                     norecovery/noload  
@@ -130,13 +131,24 @@ mount -t xfs -o  barrier|nobarrier = enable/disbale barriers (default enabled)
                  norecovery        = mount read-only without log recovery
                  sunit/swidth      = stripe unit/stripe width
 #
-V- Fragmentation
-
+V- Defragmentation
+#
+filefrag   = report file fragmentation for ext4 and xfs
+Example: filefrag -v /mnt/fsfrag/largefile
+#
 1) Ext4
+#
+e2fsck     = report the percentage of fragmented files
+Example: e2fsck -fn /dev/sdb1 (should be umounted ?)
+e2freefrag = report free space fragmentation
+Example: e2freefrag /dev/sdb1
+e4defrag   = defragmentation tool
+Exmaple: e4defrag -v  <target> : target can be file,directory,device
+         e4defrag -c  <target> : suggest defragmenation or not (no defrag)
 2) XFS
-
+#
 VI- Comparison of FS
- 
+###################################################################
                         EXT4             XFS        BTRFS
 
 Indexing Algorithm      Hash B-tree      B+tree     Modified B-tree
