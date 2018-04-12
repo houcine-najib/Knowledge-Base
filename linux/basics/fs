@@ -141,11 +141,19 @@ Example: filefrag -v /mnt/fsfrag/largefile
 e2fsck     = report the percentage of fragmented files
 Example: e2fsck -fn /dev/sdb1 (should be umounted ?)
 e2freefrag = report free space fragmentation
-Example: e2freefrag /dev/sdb1
+Example: e2freefrag /dev/sdb1 (debugfs: freefrag)
 e4defrag   = defragmentation tool
 Exmaple: e4defrag -v  <target> : target can be file,directory,device
          e4defrag -c  <target> : suggest defragmenation or not (no defrag)
 2) XFS
+#
+xfs_db  = report a fragmentation factor for device
+Example: xfs_db -c frag -r /dev/sda1
+xfs_bmap = report a fragmentation factor for file
+Exmaple: xfs_bmap -v /mnt/fsfrag/largefile
+xfs_fsr  = defragmentation tool
+Exmaple: xfs_fsr -v <target> : target can be file,device
+         xfs_fsr -v          : defrag all xfs mounts (-t specifiy time in seconds ; default 7200s)
 #
 VI- Comparison of FS
 ###################################################################
