@@ -1,14 +1,14 @@
 I- Hardware
-
+#
 fdisk -l  : list all disks and paratitions (/proc/paratitions)
 lsblk -a  : list all block devices.
 lsblk -pt : list topology of all devices.
 lsblk -S  : list all iSCSi devices.
 
 II- Disk IO Scheduler : Elvator
-
+#
 1) CFQ
-Linux supports io scheduling priorities and classes since 2.6.13 with the CFQ io scheduler.
+Note: io scheduling priorities and classes supported only for CFQ io scheduler.
 2) deadline
 3) noop
 
