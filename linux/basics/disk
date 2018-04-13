@@ -7,9 +7,20 @@ lsblk -S  : list all iSCSi devices.
 
 II- Disk IO Scheduler : Elvator
 #
+default: CFQ SATA drives.
+         deadline all other drives.
+set default at boot through kernel commandline : elevator=<type>
+#
+General Block Devices Parameters
+# Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/block/queue-sysfs.txt
 1) CFQ
+# Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/block/cfq-iosched.txt
+
+
+
 Note: io scheduling priorities and classes supported only for CFQ io scheduler.
 2) deadline
+# Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/block/deadline-iosched.txt
 3) noop
 
 
