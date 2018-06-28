@@ -15,25 +15,24 @@ lscpu         : Max Freq; Min Freq; L1i,L1d,L2,L3 cache; Flags(*)
 x86info       : 
 /proc/cpuinfo : file
 cpupower      : cpupower -c all frequency-info
+                cpupower -c all frequency-info --freq     = Current Frequency ( CPUFreq)
+                                               --hwlimits = CPU Hardware Limits
+
+# (*) Flags are CPU features,example 1GB page support (HugePage) 
+# Also the sysfs file system expose some information and setting in : /sys/bus/cpu/devices/cpu{0..n} 
+
+x86info -c : CPU Cache Informations    
 #
-(*) Flags are CPU features,example 1GB page support (HugePage) 
-
-Also the sysfs file system expose some information adn setting in : /sys/bus/cpu/devices/cpu{0..n} 
-
-CPU Cache Info :
-
-x86info -c    
-
 L1-i (instruction cache)
 L1-d (data cache)
 TLB (Translation Lookaside Buffer)
 L2  
 L3 
-
+#
 getconf -a 
-
+#
 CPU Performance Counters:
-
+#
 CPU cycles
 CPU instructions
 L1,L2,L3 cache accesses: hits, misses
@@ -48,33 +47,51 @@ CPU Governer set cpu-freq policy based on frequency limits : scaling_max_freq
 
 These limits(default lspcu values) ,available as files in /sys/bus/cpu/devices/cpu#/cpufreq/ 
 These files are  writable by echoing allowing CPU OC(OverClocking BIOS).
-
-
-
+#
 Available governers can be listed in scaling_available_governors file :
   
   powersave   = lowest  frequency within  scaling_min_freq and scaling_max_freq
   performance = highest frequency within  scaling_min_freq and scaling_max_freq
-  userspace   = set     If supported (*)     frequency in  scaling_setspeed
+  userspace   = set     If supported (*)  frequency at         scaling_setspeed
   ondemand 
   conservative 
 
-  cpupower frequency-info --governors
+# List available CPU governers
+cpupower frequency-info --governors
 
-(*) CPU Kernel Drivers don't support all governers (E.g:intel_pstate) to view current driver: 
-    cpupower frequency-info --driver
-    Intel P-State default driver  can be disabled by kernel commandline : intel_pstate=disable (ACPI-CPUFreq Driver)
+CPU Kernel Drivers don't support all governers (E.g:intel_pstate) to view current driver: 
+# List Kernel CPU driver
+cpupower frequency-info --driver
+#
+Intel P-State default driver  can be disabled by kernel commandline : intel_pstate=disable (ACPI-CPUFreq Driver)
+# Documenation on Intel P-State driver in /usr/share/doc/kernel-doc-<version>/Documenation/cpu-freq/intel-pstate.txt
+/sys/devices/system/cpu/intel_pstate/ : max_perf_pct =
+                                        min_perf_pct =
+                                        no_turbo     = 
+# Setting CPU Governer 
+cpupower -c <cpu_list> frequency-set --governor <gov>
 
-CPU Governer can be set by echoing into scaling_governor or through : 
+echo <gov>  > /sys/bus/cpu/devices/cpu#/cpufreq/scaling_governor
 
+# Setting Min and Max CPU Frequency in Khz
+cpupower -c <cpu_list> frequency-set --max <max_freq_Khz> --min <min_freq_Khz>
+
+echo <max_freq_Khz>  > /sys/devices/system/cpu/cpu#/cpufreq/scaling_max_freq
+echo <min_freq_Khz>  > /sys/devices/system/cpu/cpu#/cpufreq/scaling_min_freq
+
+# Setting CPU Frequency
+cpupower -c <cpu_list> frequency-set --freq <freq_Khz>
+
+echo <freq_Khz>  > /sys/devices/system/cpu/cpu#/cpufreq/scaling_setspeed
+
+# Managing CPU Power Policy
 x86_energy_perf_policy Energy Perf Bias tool which set energy policy for cpu 
-  x86_energy_perf_policy  -c [cpu] -v 'performance/normal/powersave'
-  x86_energy_perf_policy  -c [cpu] -v  n [0-15] ( 0: max perfomance ;15:max energy efficiency)
 
-cpupower set --perf-bias [0-15] ( 0: max perfomance ;15:max energy efficiency)
-cpupower frequency-set --governor <gov>
+x86_energy_perf_policy  -c [cpu] -v 'performance/normal/powersave'
+x86_energy_perf_policy  -c [cpu] -v  n [0-15] ( 0: max perfomance ;15:max energy efficiency)
 
-echo <gov>  > /sys/bus/cpu/devices/cpu#/cpufreq/scaling_governor 
+cpupower set --cpu <cpu_list> --perf-bias [0-15] ( 0: max perfomance ;15:max energy efficiency)
+
 
 IV- IRQ (Interrupt Request)
 

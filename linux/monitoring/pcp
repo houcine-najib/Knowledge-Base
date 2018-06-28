@@ -1,0 +1,15 @@
+Performance Co-Pilot: collect and graph data from various subsystems.
+
+pmcd
+ The Performance Co-Pilot Collection Daemon (PMCD).
+pmie
+ The Performance Metrics Inference Engine.
+pmlogger
+ The performance metrics logger.
+
+
+
+
+
+
+

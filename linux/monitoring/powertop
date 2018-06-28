@@ -1,0 +1,13 @@
+powertop   
+ --auto-tune : set tunables to good
+ --calibrate : show powerconsumption in first column
+ --csv=      : CSV
+ --html=     : HTML
+ --dump=     : plain text  
+ --time=     : set time intervals in seconds
+
+powertop2tuned <new_profile_name>
+ --enable        : all setting are enabled 
+ --new-profile   : create new profile do not include active one
+ --merge-profile : merge with profile
+ --input         : give HTML report 

@@ -1,0 +1,38 @@
+I-CPU Power Management
+# --> Refer to CPU file.
+
+II-Runtime Device Power Management (RDPM) filesystem : /sys/devices/<device>/power/ 
+#
+/sys/devices/<device>/power/control = auto : RDPM enabled if supported
+                                    = on   : disbale driver from managing device power state
+#
+/sys/devices/<device>/power autosuspend_delay_ms = device idle period in ms before suspending it . 
+
+III-File System 
+
+
+IV- Disk 
+
+
+V- Radio Frequency
+# List all RF devices
+rfkill list 
+# Disable RF Device
+rfkill block <device_number>
+rfkill block all
+# Enable RF Device 
+rfkill unblock all
+
+# Disbale Bluetooth
+hciconfig hci0 down
+rmmod btusb
+
+# Set Wifi Powersave Mode
+
+VI- Wake on LAN
+#
+ethtool -s ethO wol d
+#
+Configuration files (ifcfg-*):
+# 
+ETHTOOL OPTS="wol d"
