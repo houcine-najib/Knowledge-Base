@@ -1,0 +1,8 @@
+Hardware Profile : 
+
+dmidecode : dmidecode -s or /sys/class/dmi/id
+            dmidecode -t 
+dmesg
+lspci
+lsusb
+

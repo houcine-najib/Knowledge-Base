@@ -1,9 +1,11 @@
+I- Definition UMA & NUMA
 
-Uniform Memory Access (UMA)     : symmetric multiprocessing (SMP) 
+Uniform Memory Access (UMA) Symmetric Multiprocessing (SMP) 
 Each CPU has uniform access latency to all of memory, via a shared system bus.
 
 Non-Uniform Memory Access(NUMA) : 
 Each CPU has a dedicated area of memory combained referred to as NUMA  Node.
+
 
 /sys/devices/system/node : NUMA nodes infos , and relative distances between those nodes.
 Example : per node hugepages   : cat /sys/devices/system/node/*/hugepages/hugepages-2048kB/*

@@ -1,15 +1,45 @@
 Performance Co-Pilot: collect and graph data from various subsystems.
 
-pmcd
- The Performance Co-Pilot Collection Daemon (PMCD).
-pmie
- The Performance Metrics Inference Engine.
-pmlogger
- The performance metrics logger.
+# Install and Configure
+yum install pcp-gui pcp-conf pcp-doc pcp-system-tools 
+systemctl enable pmcd
+systemctl start pmcd
+
+/etc/pcp.conf 
+/etc/pcp
 
 
 
+List of PCP Systemd services
+#
+pmcd       performance metrics collector daemon
+pmie       set performance metric rules and actions (with pmieconf).
+pmlogger   generates PCP performance metrics Archives.
+pmproxy    performance proxy server 
 
+
+
+List of PCP Tools
+#
+pminfo   display information about performance metrics
+pmstat   pcp vmstat 
+         -s : Number of Samples
+         -t : interval in seconds
+pmatop   interactive top-like system monitor
+pmrep    customizable performance metrics reporting tool
+pmval    arbitrary performance metrics value dumper
+
+pmcollectl collects and displays system-level data
+           -c : count number
+           -i : interval in seconds
+
+pmprobe    lightweight probe for performance metrics
+
+
+
+PCP GUI Tools 
+#
+pmchart
 
 
 

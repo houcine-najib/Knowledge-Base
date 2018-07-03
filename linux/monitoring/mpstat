@@ -1,0 +1,3 @@
+mpstat Multiprocessor Stat
+
+mpstat -P { cpu# or ALL }  <delay_seconds>  <count>

@@ -1,0 +1,6 @@
+tuned-adm : Tuned Administration Tool
+           
+tuned-adm active             : show current active profile
+          profile <profile>  : change profile 
+          list               : list all profiles
+          off                : unload all tunings
