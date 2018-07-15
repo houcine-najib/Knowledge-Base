@@ -2,13 +2,14 @@ Performance Co-Pilot: collect and graph data from various subsystems.
 
 # Install and Configure
 yum install pcp-gui pcp-conf pcp-doc pcp-system-tools 
-systemctl enable pmcd
-systemctl start pmcd
+# PCP Web Based
+yum install pcp pcp-webapi pcp-webapp-vector 
+
+systemctl enable pmcd  {pmlogger} {pmwebd}
+systemctl start  pmcd  {pmlogger}  {pmwebd}
 
 /etc/pcp.conf 
 /etc/pcp
-
-
 
 List of PCP Systemd services
 #
@@ -17,29 +18,33 @@ pmie       set performance metric rules and actions (with pmieconf).
 pmlogger   generates PCP performance metrics Archives.
 pmproxy    performance proxy server 
 
-
-
 List of PCP Tools
 #
-pminfo   display information about performance metrics
-pmstat   pcp vmstat 
-         -s : Number of Samples
-         -t : interval in seconds
-pmatop   interactive top-like system monitor
-pmrep    customizable performance metrics reporting tool
-pmval    arbitrary performance metrics value dumper
+pminfo     display information about performance metrics
+             -dfmtT : detailed metric information and current value
+
+pcp        check installation informations
+
+pmstat     pcp vmstat 
+             -s : Number of Samples
+             -t : interval in seconds
+
+pmatop     interactive top-like system monitor
+pmrep      customizable performance metrics reporting tool
+pmval      arbitrary performance metrics value dumper
+
 
 pmcollectl collects and displays system-level data
-           -c : count number
-           -i : interval in seconds
+             -c : count number
+             -i : interval in seconds
 
+pmdumptext  Dump metric past values 
+             -Xlimu -t <interval> -S @<start_time> -T @<end_time>  <metrics>
+ 
 pmprobe    lightweight probe for performance metrics
+pmchart    pcp desktop gui
+Vetcor     http://localhost:44323/vector/ web-ui
 
-
-
-PCP GUI Tools 
-#
-pmchart
 
 
 

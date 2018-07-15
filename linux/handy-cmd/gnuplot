@@ -1,0 +1,62 @@
+I- General Options and Usage
+
+File Mode
+#
+gnuplot               plot_file.gnuplot
+         -p --persist plot_file.gnuplot
+Interactive Mode
+#
+gnuplot  
+
+II- Plotting Options
+
+set xdata/ydata   {time}     = set X/Y-Axis datatype default numercial (E.g: time)
+set xlabel/ylabel            = set X/Y-Axis label
+set title                    = set plot graph title 
+
+set timefmt                  = set time format (E.g: %H:%M:%S)
+
+set format x/y               = set X/Y-Axis format (E.g: set format x '%H:%M:%S' / set format y "%.1f" )
+set xrange/yrange [min:max]  = set X/Y-Axis range  (E.g: set yrange [0:10] / set xrange ["23:59:50":"00:00:10"] )
+
+set linetype <lt_number> lw <light_weight> lc rgb "<olor>"
+
+
+set terminal <png|jpeg|gif|svg>
+set output   "gnuplot_image.<png|jpeg|gif|svg>"
+
+plot  "data_file_path"        using <x_column_number>:<y_column_number> (E.g: plot "uptime.data" using 1:4)
+       title                            = set title for each graph
+       with  <style>                    = set graph style (E.g: plot with lines )
+       with  lines  lt <lt_number>      = set graph style linetype
+
+
+II- Example
+
+set xdata   time     
+set xlabel 'Time'
+set ylabel 'Load Average'  
+set title  'GNUPLOT DEMO'
+
+set timefmt '%H:%M:%S'
+
+
+set format x "%H:%M:%S"
+set format y "%.1f"
+
+set xrange ["01:30:00":"01:40:00"]
+set yrange [0:2]
+
+set linetype 1 lw 2 lc rgb "blue"
+set linetype 2 lw 2 lc rgb "red"
+set linetype 3 lw 2 lc rgb "forest-green"
+
+
+set terminal png 
+set output "gnuplot_demo.png"
+
+plot 'uptime.data' using 1:4 title '15-min' with lines lt 1 ,\
+     'uptime.data' using 1:2 title '5-min'  with lines lt 2 ,\
+     'uptime.data' using 1:3 title '10-min' with lines lt 3
+
+

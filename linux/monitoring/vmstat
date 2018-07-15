@@ -5,7 +5,7 @@ vmstat [delay [count]] : output each delay seconds for count times.
 vmstat -n              : remove periodic headers.
 vmstat -a              : print active/inactive memory.
 vmstat -p <partition>  : print disk partition device stats.
-vmstat -d              : print disk stats.(-D suumary)
+vmstat -d              : print disk stats.(-D sumary)
 vmstat -m              : print slabinfo.
 vmstat -w              : wide output.
 
@@ -29,7 +29,8 @@ cpu    us:   % running non-kernel code : user time
 
 disk- ------------reads------------ ------------writes----------- -----IO------
        total merged sectors      ms  total merged sectors      ms    cur    sec
-disk   total:   total reads/writes completed successfully
+
+       total:   total reads/writes completed successfully
        merged:  grouped reads.writes (resulting in one I/O)
        sectors: sectors read successfully
        ms:      milliseconds spent reading/writing
@@ -38,6 +39,7 @@ disk   total:   total reads/writes completed successfully
 
 SLAB
 Cache                       Num  Total   Size  Pages
+
      cache:  cache name
      num:    number of currently active objects
      total:  total number of available objects

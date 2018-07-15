@@ -1,0 +1,12 @@
+PID Stat
+
+pidstat [options]  [interval] [count]
+
+-C  : common process name (regex)
+-p  : specify process ID
+
+-u  : CPU Utilization
+-r  : Memory Utilization & Page Faults
+-d  : IO Stat
+-w  : Context Switch
+

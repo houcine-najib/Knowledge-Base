@@ -1,0 +1,181 @@
+System Activity Reporter
+
+I- Installation  and Configuration
+
+1) Installation
+yum install sysstat
+
+2) 24-hour Time  
+alias sar = 'LANG=C sar'
+Note: add alias entry in ~/.bashrc or /etc/bashrc for persistence
+
+3) Configuration
+Config file          : /etc/sysconfig/sysstat
+HISTORY=<day_number> : number of days to archive sar data
+/var/log/sa/sadd     : sar daily data file dd are day of month 
+SADC_OPTIONS="-S X " : system activity data collector options where X=INT,DISK,SNMP,IPV6,POWER,XDISK,ALL,XALL 
+
+4) General Command Options
+
+sar [options] [ interval [ count ]
+    
+    -A   : record all
+    -o   : save output to file
+    -f   : read from file    
+
+II- CPU & Scheduler 
+
+1) CPU Usage
+
+sar -u -P ALL  ( -P: specify processor number, ALL : all fields )
+ 
+  %user   =  user time + virtual processor.
+  %usr    =  user time
+  %nice   =  cpu usage for nice application
+  %system =  kernel time + irq time
+  %sys    =  kernel time
+  %iowait =  IO wait time
+  %steal  =  hypervisor stealed cpu 
+  %irq    =  irq time
+
+2) Queue Status
+
+sar -q    
+
+ runq-sz    = run queue length (number of runnable task) 
+ plist-sz   = number of tasks in the task list
+ ldavg-1    = load average for last minute
+ ldavg-5    = load average for last 5  minute
+ ldavg-15   = load average for last 15 minute
+ blocked    = number of task blocked waiting for I/O
+                     
+
+3) Context Switch
+
+sar -w 
+ 
+ proc/s      = number of tasks created per second.
+ cswch/s     = number of context switches per second.
+
+4) Interrupts
+
+sar -I {int [,..] | SUM |ALL|XALL}
+
+ intr/s     = interrupt per second
+
+III- Memory
+
+1) Memory Usage
+
+sar -r
+ 
+ kbmemfree  = free memory in KiB
+ kbmemused  = used memory in KiB (execluding kernel)
+ kbbuffers  = buffer cache in KiB
+ kbcached   = page cache in KiB
+ %commit    = percentage of memory needed for current workload over VM (RAM+Swap)
+ kbactive   = active   list memory in kiB
+ kbinact    = inactive list memory in KiB
+ kbdirty    = dirty memory in KiB
+  
+2) Memory Stat
+
+sar -R
+
+ frpg/s      = memory pages freed (negative indicates allocations) per second
+ bufpg/s     = buffer cache page additions per second
+ campg/s     = page cache page allocations per second
+
+3) Hugepages
+
+sar -H
+
+  kbhugfree  = hugepages in KiB not allocated
+  kbhugused  = hugepages in KiB allocated
+  %hugused   = % of used hugepages
+
+4) Paging
+
+sar -B
+
+  pgpgin/s   = amount of memory in KiB paged in from disk
+  pgpgout/s  = amount of memory in KiB paged out to  disk
+  fault/s    = number of faults (minor+major) per second 
+  majflt/s   = number of major faults per second
+  pgfree/s   = pages added to free list per second
+
+5) Swapping
+
+sar -W
+
+ pswpin/s    = number of pages swapped-out per second
+ pswout/s    = number of pages swapped-in  per second
+
+sar -S
+ 
+ kbswpfree  = free swap space in KiB
+ kbswpused  = used swap space in KiB
+ kbswpcad   = cached swap space (Mem+Swap) can be paged-out without disk I/O in KiB
+ 
+IV- Network
+
+sar -n DEV  : network interface statistics
+ rxpkt/s    = received    packets per second    
+ txpkt/s    = transmitted packets per second
+ rxkB/s     = received    kilobytes per second
+ txkB/s     = transmitted kilobytes per second
+
+sar -n EDEV : network interface errors
+ rxerr/s    = received packet errors per second
+ txerr/s    = transmitted packet errors per second
+ coll/s     = collisions packets per second
+ rxdrop/s   = received packets dropped (buffer full) per second
+ txdrop/s   = transmitted packets dropped (buffer full) per second
+ rxfifo/s   = received packets FIFO overrun errors  per second
+ txfifo/s   = transmitted packets FIFO overrun errors per second
+
+sar -n IP   : IP datagram statistics
+ irec/s     = input datagrams (received) per second
+ fwddgm/s   = forwarded datagrams per second
+ orq/s      = output datagram requests (transmit) per second
+
+sar -n EIP  : IP error statistics
+ idisc/s    = input discards (e.g., buffer full) datagrams per second
+ odisc/s    = output discards (e.g., buffer full) datagrams per second
+
+sar -n TCP  : TCP statistics
+ active/s   = new active TCP connections (connect()) connections per second
+ passive/s  = new passive TCP connections (listen()) connections per second
+ iseg/s     = input segments (received) segments per second
+ oseg/s     = output segments (sent) segments per second
+
+sar -n ETCP : TCP error statistics
+ atmptf/s   = active TCP connection fails per second
+ retrans/s  = TCP segments retransmitted per second
+
+sar -n SOCK : Socket usage
+ totsck     = total sockets in use 
+ ip-frag    = IP fragments currently queued 
+ tcp-tw     = TCP sockets in TIME-WAIT
+
+V- Disk & FS
+
+1) Disk
+
+sar -d -p (-p : for device naming)
+
+See iostat
+
+2) FS
+
+sar -v
+
+ dentunusd   = unsed dentry cache 
+ file-nr     = number of open files
+ inode-nr    = number of inodes used
+
+V- Power
+
+sar -m 
+See man sar
+

@@ -1,0 +1,16 @@
+Linux Escape Sequences
+
+\b Backspace
+\n Newline
+\r Carriage Return
+\t Horizontal Tab
+\v Vertical Tab
+
+\d Match a digit e.g. [0-9]
+\D Match a non-digit e.g. [^0-9]
+
+\w Match a word character (alphanumeric) e.g. [a-zA-Z_0-9]
+\W Match a non-word character e.g. [^a-zA-Z_0-9]
+
+\s Match a whitespace character e.g. [ \t\n\r\f]
+\S Match a non-whitespace character e.g. [^ \t\n\r\f]

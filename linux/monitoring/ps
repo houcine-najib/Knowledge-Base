@@ -1,3 +1,29 @@
-ps : process status
-ps [-o etime,time,pcpu,command] [-u user] [-U user] [PID]
+Process Status
+
+ps  <PID>
+         -o                 : specify options 
+         -A|-e              : all process
+         -L,-m,-T|m         : show threads (LWP)
+         -H|f               : forest/ASCII
+         -u,-U|U            : select by user name
+         -p|p               : select by pid
+
+Note: BSD options : without dash , UNIX options with dash
+
+PS Options
+   
+comm     =  simple name of executable
+pid      =  process id
+ppid     =  process parent id
+%cpu     =  cpu utilization 
+%mem     =  memory utilization
+time     =  cumulative CPU time
+etime    =  elapsed time since process start
+rss      =  resident set size (in kiloBytes)
+vsz      =  virtual memory size
+cls      =  process scheduling policy
+pri      =  process priority 
+rtprio   =  realtime priority
+ni       =  nice value
+cgroup   = process CGroup name
 

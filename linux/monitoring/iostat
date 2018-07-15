@@ -1,0 +1,40 @@
+IO Stat 
+
+iostat [options] [interval] [count]
+       -d <device> : specify device
+       -p <device> : include paratitions
+       -x          : Extended Stat
+       -c          : CPU Usage
+       -N          : LVM Stat
+       -g <group>  : group devices 
+       -k|-m       : use kilobytes | megabytes         
+       -y          : stat since boot
+       -t          : print timestamp
+
+Device Metrics
+
+tps             =  transfers      per second.
+Blk_read/s      =  blocks read    per second.
+Blk_wrtn/s      =  blocks written per second.
+Blk_read        =  blocks read    during the interval.
+Blk_wrtn        =  blocks written during the interval.
+
+Extended Statistics 
+
+rrqm/s          = reads  merged before issued to the disk.
+wrqm/s          = writes merged before issued to the disk.
+r/s             = reads  issued to the disk per second.
+w/s             = writes issued to the disk per second.
+rsec/s          = sectors read per second.
+wsec/s          = sectors written per second.
+rkB/s           = kilobytes read from disk per second.
+wkB/s           = kilobytes written to disk per second.
+avgrq-sz        = average size (in sectors) of disk requests.
+avgqu-sz        = average size of the disk request queue.
+await           = average time for disk request complete (queue + svctm) in ms
+svctm           = average service time in ms                    
+
+Note: For CPU refer to sar
+
+References
+(1) linux/monitoring/sar

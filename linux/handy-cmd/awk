@@ -1,0 +1,52 @@
+I- Usage Methods
+
+awk  -f <awk_scritp>      <input_file>
+awk  '<awk_expression>'   <input_file>
+
+II- Filter
+
+awk /<regex>/ <input_file> 
+
+Similar to regex (E.g:  First Field) 
+awk '{ $1 ~ /<regex>/ }' <input_file>
+Not Similar to regex ( E.g : First Field) 
+awk '{ $1 !~ /<regex>/ }' <input_file>
+
+III- AWK Script
+
+BEGIN {FS ="\t"; x=0 }     : Executed at the begining
+     
+  {print $0;x++}           : Exectued at every record
+
+END    {print x}           : Exectued at the end 
+
+IV- Fields and Records
+
+awk -F ="\n"  <input_file>  : Specify Filed Sperator 
+#
+Note: FS can be regex (E.g: FS="^[1..9]" ) or expression (E.g: FS=";|:") or multipe (E.g: FS="[;,!]")
+
+awk 'BEGIN {FS="\n";OFS=";";RS="\r";ORS="\n"}'  <input_file>
+     
+     FS  = Field Sperator
+     OFS = Output Field SPerator
+     RS  = Record Speratot
+     ORS = Output Record Sperator
+
+Variables
+     $NF     = Last  Field ( Total Number of Fileds) 
+     $1      = First Field
+     $2      = Second Field
+     $(NF-1) = One before last Field 
+     $0      = Whole Record
+     $NR     = Number of Records            
+  
+FILENAME = Name of input file
+FNR      = Number of Records for each file     
+
+V- AWK Built-In Functions
+system : Execute system commands ( E.g.: awk ' {system("stat " $9) }' file_list.txt )
+
+References
+(1) linux/handy-cmd/regex
+(2) linux/handy-cmd/escseq

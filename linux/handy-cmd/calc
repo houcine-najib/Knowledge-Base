@@ -1,0 +1,44 @@
+I- bc calculator
+# Decimal Calculations
++ (addition)
+- (subsraction
+* (multiplication)
+^ (power)
+/ (division)
+E.g.: 
+bc
+scale=8
+2^8+4*4-8/2
+
+# Heximal to Decimal conversion and vice versa
+Form HEX to DEC
+ibase=8
+obase=16
+
+From DEC to HEX
+ibase=16
+obase=8
+
+II- dc calculator
+p : print stack
+c : clear stack
+f : full content of stack
+q : quit
+E.g.:
+dc
+2
+8
+^p
+250-p
+
+III- bash calculator
+echo $((arthemtic_expression))
+
++  (addition)
+-  (subsraction
+*  (multiplication)
+** (power)
+/  (division)
+
+
+

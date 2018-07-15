@@ -1,7 +1,37 @@
 Systemtap : tool used for profiling 
 
-Systemtap Script (.stp) : a collection of probes that execute a handler upon the occurance of an event.
-Probe is an event and it's corresponding handler (probe body).
+I- Stap Installation and Command Options
+
+1) Installation
+
+On host machine
+
+subscription-manager repos --enable rhel-7-server-debug-rpms
+
+yum install kernel-debugginfo kernel-devel systemtap
+
+On target machine
+
+yum install systemtap-client
+
+2) Command Options
+
+stap  -vvv : verbose
+      -o   : stdout to file
+      -e   : run script
+      -r   : kernel release
+      -m   : module name (without .ko)
+      -p   : pahse number (1-5: parse, elaborate, translate, compile, run)
+      -x   : set target to PID
+      -c   : set target to command
+      -F   : Run script in backgound with Filght Recoder
+      -l   : list all available probe
+      -L   : list probe points and script-level local variables
+
+II- Systemtap Script
+
+.stp extension file  a collection of probes that execute a handler upon the occurance of an event.
+Note: a probe is an event and it's corresponding handler (probe body).
 
 Systemtap Script Syntax : 
 
@@ -10,73 +40,28 @@ probe event {statements}
 function function_name(arguments){statements}
 probe event {function_name(arguments)}
 
-List of events/probes : 
 
-Synchronous Events :
-
-syscall.system_call         --> syscall.system_call.return
-vfs.file_operation          --> vfs.file_operation.return
-kernel.function("function") --> kernel.function("function").return
-kernel.trace("tracepoint")
-module("module").function("function")
-
-Asynchronous Events
-
-begin : at run of systemtap script
-end   : at end of systemtap session
-timer : periodically (s,ms,us,ns,hz) syntax eg : timer.s(4)
-
-
-exit() : to exit the systemtap session
-
-Systemtap Functions/Built-in Variables:(Tapset Library https://sourceware.org/systemtap/tapsets/)
-
-execname()
-uid()
-pid()
-cpu()
-gettimeofday_ns()
-gettimeofday_s()
-task_current()
-probefunc()
-probemod()
-cmdline_str()
-target()
-ctime()
-thread_indent()
-
-
-
+III- Instrumentation Modules
 
 SystemTap instrumentation modules from a SystemTap script on one computer to be used on another computer
 
-Systemtap instrumentation module require systemtap-runtime, to build a module use 
+In order to build a module on host machine with debug installed use :
 
 stap -r kernel_version(on_target) script -m module_name -p4
 
-Groups stapdev : stap & staprun (Privilgied Group) 
-       stapusr : staprun (Only) run instrumentation modules from /lib/modules/kernel_version/systemtap/
 
-Run an instrumentation module 
+Groups stapdev : stap to compile instrumentation modules 
+       stapusr : staprun  and run modules from /lib/modules/kernel_version/systemtap/
+
+Note: user in both stapdev and stapusr groups may run systemtap scripts and instrumentation modules (anywhere)
+
+instrumentation module require systemtap-runtime on target machine to run : 
 
 staprun module_name.ko
 
-stap  -vvv : verbose
-      -o   : stdout to file 
-      -e   : run script
-      -x   : set target to PID
-      -c   : set target to command
-      -F   : Run script in backgound with Filght Recoder
-      -l   : list all available probe 
-      -L   : list probe points and script-level local variables
+IV- Examples
 
-Flight Recorder : 
-In-Memory  : stap -F -s2 script.stp                     (s2 : 2MB for kernel Buffer)
-File       : stap -F -o  systap.log -S 1,2 script.stp   (-S 1,2 : Max File Size in MB , Number of Files)
-
-
-
-
+Note: provided examples may be found in : /usr/share/systemtap/examples
 
 Example 1: list entry probes 
 
@@ -109,3 +94,38 @@ stap -e 'global s;
          probe syscall.read.return { if (execname() == "mysqld") {
          s <<< gettimeofday_ns() - @entry(gettimeofday_ns()); } }
          probe end { printf("ns\n"); print(@hist_log(s)); }
+
+V- List of events/probes :
+
+1) Synchronous Events
+syscall.system_call         --> syscall.system_call.return
+vfs.file_operation          --> vfs.file_operation.return
+kernel.function("function") --> kernel.function("function").return
+kernel.trace("tracepoint")
+module("module").function("function")
+
+2) Asynchronous Events
+begin : at run of systemtap script
+end   : at end of systemtap session
+timer : periodically (s,ms,us,ns,hz) syntax eg : timer.s(4)
+exit() : to exit the systemtap session
+
+VI- Systemtap Functions/Built-in Variables:(Tapset Library https://sourceware.org/systemtap/tapsets/)
+execname()
+uid()
+pid()
+cpu()
+gettimeofday_ns()
+gettimeofday_s()
+task_current()
+probefunc()
+probemod()
+cmdline_str()
+target()
+ctime()
+thread_indent()
+
+VII- Flight Recorder :
+In-Memory  : stap -F -s2 script.stp                     (s2 : 2MB for kernel Buffer)
+File       : stap -F -o  systap.log -S 1,2 script.stp   (-S 1,2 : Max File Size in MB , Number of Files)
+

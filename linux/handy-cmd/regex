@@ -1,0 +1,31 @@
+Linux Regular Expressions
+
+I- Quantifiers
+
+?     0 or 1          character
+*     0 or more       character
++     1 or more       character
+{n}   n               preceding item  
+{n,}  n or more       preceding item 
+{n,m} between n and m preceding item 
+
+II- Anchors
+
+^  at the beginning of the line
+$  to the end       of the line
+
+III- Character Classes
+
+.      a   single character
+[...]  any of the characters 
+[^...] not any of the characters
+
+IV- POSIX Classes
+
+[:alpha:] All alphabetic characters, upper and lower
+[:alnum:] All alphabetic and numeric characters
+[:upper:] All upper-case letters
+[:lower:] All lower-case letters
+[:digit:] All numbers
+[:punct:] All punctuation
+[:space:] All white-space characters
