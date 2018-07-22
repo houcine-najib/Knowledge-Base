@@ -1,4 +1,3 @@
-
 # Units Types
 service : service or application
 socket  : network/IPC socket or FIFO buffer associated with service file
@@ -11,6 +10,7 @@ path    :
 timer   : schedule activation (cron job)
 snapshot: revert to current state after changing (systemctl snapshot ,session based temporary)
 slice   : linux control goup nodes , manage resources of set of processes(service/scope) default :root,user,system
+          to create child slice of parent parent-child.slice (E.g: system-flops.slice)
 scope   : externally created system process
 
 # Drop-ins and snippets
@@ -31,6 +31,7 @@ systemctl kill name.service --kill-who=PID,... --signal=signal
 # Modify Systemd units
 
 # On the fly
+# Documentation in man systemc.resource-control
 systemctl set-property  --runtime unit-name property=value
 --runtime (Optional) = make non-persistent change to persistent  units
 --runtime (Mandatory)= make change to transient units
@@ -39,10 +40,12 @@ systemctl set-property  --runtime unit-name property=value
 systemclt  daemon-reload
 systemclt  restart <unit_name>.<unit_type>
 
+# List of All Systemd Unit properities
+# This include non-cgroup (Documentation in man systemd.exec)
 
-# List of Systemd CGroup properities
+# Systemd CGroup Proprities List (See info below):
 # Documentation in man systemd.resource-control
-
+#
 # CPU Configuration for Systemd Unit
 
 CPUAccounting    = true/false (true for all units in slice and slice parents)
@@ -50,17 +53,16 @@ CPUShares        = weight of cpu (defaults 1024) at runtime and startup (if Star
 StartupCPUShares = weight of cpu on startup only
 CPUQuota         = % of CPU time (> 100 more than one cpu)
 
-Nice                     = Nice level (scheduling priority) -20 (highest) ... 19 (lowest)
-CPUAffinity              = Space-Separated list of CPU
-CPUSchedulingPolicy      = other, batch, idle,fifo or rr
-CPUSchedulingPriority    = 1 lowest .. 99 highest (RT Policy)
-CPUSchedulingResetOnFork = Reset CPU Scheduling on process fork
+Note: for systemd unit(slice,scope,service) with : CPUAccounting=true
+      other cpu options (*) are in /sys/fs/cgroup/cpu/<parent>.slice/<parent-child>.slice/<service_name>.service
 
 # RAM Configuration for Systemd Unit
 
 MemoryAccounting = true/false (true for all units in slice and slice parents)
 MemoryLimit      = Limit of memory in bytes
-OOMScoreAdjust   = Set Out-Of-Memeory Score -1000 (Disabled)... 1000(High OOM likelihood) 
+
+Note: for systemd unit(slice,scope,service) with : MemoryAccounting=true
+      other memory options (*) are in /sys/fs/cgroup/memory/<parent>.slice/<parent-child>.slice/<service_name>.service
 
 # Block I/O Configuration for Systemd Unit
 
@@ -71,22 +73,15 @@ BlockIODeviceWeight   = device (dev path,file path) weight(between 10 & 1000)
 BlockIOReadBandwidth  = device (dev path,file path:backing dev)  bytes (bytes:K,M,G per second) **Buffer Support**
 BlockIOWriteBandwidth = device bytes **No Buffer Support**
 
-# I/O Scheduling Class/Priority : ionice
-# scheduling classes : 
-# idle        = process get I/O only when disk is idle (no priority).
-# best-effort = no specific I/O priority (0..7 same value RoundRobin). 
-# realtime    = process get I/O first access , it can starve other processes (0..7 set time slice on each scheduling window).
-
-IOSchedulingClass     =  0 or none, 1 or realtime, 2 or best-effort, 3 or idle
-IOSchedulingPriority  =  0 : Highest .. 7 Lowest
+Note: for systemd unit(slice,scope,service) with : BlockIOAccounting=true 
+      other blkio options (*) are in /sys/fs/cgroup/blkio/<parent>.slice/<parent-child>.slice/<service_name>.service
 
 # Task Configuration for Systemd Unit
 
-TaksAccounting = true/false (keep track of unit tasks ,true for all units in slice and slice parents)
+TasksAccounting = true/false (keep track of unit tasks ,true for all units in slice and slice parents)
 TasksMax       = Number of threads(kernel and usespace) or % of system max tasks 
 
-
-# Other Configuration for Systemd Unit 
+# Other Configuration for CGroup Systemd Unit 
 
 DeviceAllow    = device_name(path or group in /proc/devices) options(r,w,m:create)
 DevicePolicy   = auto   (default allow access to all devices)
@@ -96,27 +91,36 @@ Slice          = slice name default is system
 ExecStartPost  = command used to modify other unsupported features by systemd
                = /bin/bash -c "echo <parameter> > /sys/fs/cgroup/<resource_controller>/<slice>/<subsystem>/<parameter_file>"
 
+# List of Other Systemd Unit properities
+# Documentation in man systemd.exec
+
+# CPU 
+Nice                     = Nice level (scheduling priority) -20 (highest) ... 19 (lowest)
+CPUAffinity              = Space-Separated list of CPU
+CPUSchedulingPolicy      = other, batch, idle,fifo or rr
+CPUSchedulingPriority    = 1 lowest .. 99 highest (RT Policy)
+CPUSchedulingResetOnFork = Reset CPU Scheduling on process fork
+
+# Memory
+OOMScoreAdjust   = Set Out-Of-Memeory Score -1000 (Disabled)... 1000(High OOM likelihood)
+
+# I/O Scheduling Class/Priority : ionice
+# scheduling classes : 
+# idle        = process get I/O only when disk is idle (no priority).
+# best-effort = no specific I/O priority (0..7 same value RoundRobin). 
+# realtime    = process get I/O first access , it can starve other processes (0..7 set time slice on each scheduling window).
+#
+IOSchedulingClass     =  0 or none, 1 or realtime, 2 or best-effort, 3 or idle
+IOSchedulingPriority  =  0 : Highest .. 7 Lowest
+
 # Monitor CGroup
 
-systemd-cgls   = dislay hierarchy of cgroups
+systemd-cgls   = dislay hierarchy of cgroups (provide CGroup path as an option)
 systemd-cgls   = cpu    (service that interact with cpu controller)
                  memory (memory controller)
                  blkio  (block IO controller)
 
 systemd-cgtop  = top like resources consumption for cgroups
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+systemctl -t slice 
+(*) Refer to cgroups_libcgroup

@@ -9,6 +9,9 @@ ulimit -S(Soft) -H(Hard) -options -a(List all)
 PAM auth module call to PAM limits (/etc/pam.d/system-auth)
 PAM limits config in /etc/security/limits.conf /etc/security/limits.d/*.conf
 
+Note: user must exit and login for limit to apply
+      for each entry a new line
+
 # man limits.conf 
 # /etc/security/limits.conf
 
