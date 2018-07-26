@@ -2,8 +2,9 @@ sosreport tool to collect system profile including hardware profile.
 
 /etc/sos.conf              : configuration file (disbale plugins)
 
-sosreport -l               : list of plugins (enabled/disbaled)
-sosreport --list-profiles  : list all profiles
-sosreport -p               : specify a profle from existing ones
-sosreport                  : generate tarball report in /var/tmp/
-
+sosreport    -l               : list of plugins (enabled/disbaled)
+             --list-profiles  : list all profiles
+             -o=<plugins>     : only plugins
+             -n=<no_plugons>  : disable plugin
+             -p               : specify a profle from existing ones
+             --tmp-dir=<dir>  : specify another tmp directory

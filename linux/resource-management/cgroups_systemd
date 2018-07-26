@@ -56,6 +56,8 @@ CPUQuota         = % of CPU time (> 100 more than one cpu)
 Note: for systemd unit(slice,scope,service) with : CPUAccounting=true
       other cpu options (*) are in /sys/fs/cgroup/cpu/<parent>.slice/<parent-child>.slice/<service_name>.service
 
+Warning: for services under system slice only ones under /usr/lib/systemd/system will have directory.
+
 # RAM Configuration for Systemd Unit
 
 MemoryAccounting = true/false (true for all units in slice and slice parents)
@@ -104,12 +106,7 @@ CPUSchedulingResetOnFork = Reset CPU Scheduling on process fork
 # Memory
 OOMScoreAdjust   = Set Out-Of-Memeory Score -1000 (Disabled)... 1000(High OOM likelihood)
 
-# I/O Scheduling Class/Priority : ionice
-# scheduling classes : 
-# idle        = process get I/O only when disk is idle (no priority).
-# best-effort = no specific I/O priority (0..7 same value RoundRobin). 
-# realtime    = process get I/O first access , it can starve other processes (0..7 set time slice on each scheduling window).
-#
+# I/O Scheduling Class/Priority 
 IOSchedulingClass     =  0 or none, 1 or realtime, 2 or best-effort, 3 or idle
 IOSchedulingPriority  =  0 : Highest .. 7 Lowest
 

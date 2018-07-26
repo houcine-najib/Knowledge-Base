@@ -1,8 +1,9 @@
-Hardware Profile : 
 
-dmidecode : dmidecode -s or /sys/class/dmi/id
-            dmidecode -t 
-dmesg
-lspci
-lsusb
+dmidecode : -s <string_keyword> ( can be found also on /sys/class/dmi/id )
+            -t <type_number/keywork>
+dmesg     : -T  = display timestamp into a human-friendly format
+lspci     : -vv = more infos
+lsusb     : -vv = morfe info
+
+Note: for CPU,Memory and Disk hardware refer to each of the files
 

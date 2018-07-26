@@ -5,26 +5,49 @@ lsblk -a  : list all block devices.
 lsblk -pt : list topology of all devices.
 lsblk -S  : list all iSCSi devices.
 
-II- Disk IO Scheduler : Elvator
+II- Disk IO Scheduler : Elevator
 #
-default: CFQ SATA drives.
-         deadline all other drives.
+Default elevator  : CFQ       for SATA drives.
+                    deadline  for all other drives.
+
 set default at boot through kernel commandline : elevator=<type>
-#
+set block device through  sysfs                : echo <elevator>  > /sys/block/<block_device>/queue/scheduler
+
 General Block Devices Parameters
 # Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/block/queue-sysfs.txt
+List of parameters in  /sys/block/<block_device>/queue/ : add_random, iostats, max_sectors_kb, nomerges, nr_requests,
+                                                          read_ahead_kb, optimal_io_size, rq_affinity,
+                                                          scheduler(elevator), rotational
 1) CFQ
 # Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/block/cfq-iosched.txt
+Use Case : scheduling classes (idle,best effort,real-time)
+List of parameters in  /sys/block/<block_device>/queue/iosched : back_seek_max, back_seek_penalty, fifo_expire_async
+                                                                 fifo_expire_sync, group_idle, low_latency, quantum
+                                                                 slice_async, slice_async_rq, slice_idle, slice_sync, target_latency
 
+I/O Scheduling Class/Priority : can be set for application through  ionice
+ 
+ Classes : 
+        idle        = process get I/O only when disk is idle (no priority).
+        best-effort = no specific I/O priority (0..7 same value RoundRobin). 
+        realtime    = process get I/O first access , it can starve other processes (0..7 set time slice on each scheduling window).
 
+ Priorities :
+        0  =  Highest 
+        7  =  Lowest
 
-Note: io scheduling priorities and classes supported only for CFQ io scheduler.
+Note: IO Scheduling Priorities and Classes supported only for CFQ io scheduler.
+
 2) deadline
 # Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/block/deadline-iosched.txt
+Use Case : IO request batch suitable in case of more read operations than write opertaions
+List of parameters in  /sys/block/<block_device>/queue/iosched : fifo_batch, front_merges, read_expire
+                                                                 write_expire, writes_starved
 3) noop
-
+Use Case : simple FIFO suitable for CPU-bound systems using fast storage.
 
 III- Benchmarking 
+#
 1) bonnie++ 
 #
 Exmaple :
@@ -39,6 +62,10 @@ Exmaple : read/write entire magnetic once and output to file
 zcav -c 1 -f /dev/sda -l zcav.out
 
 3) hdparm
-
-
+#
+hdparm -I /dev/sda   : display disk informations
+hdparm -t /dev/sda   : read performance in MB/sec
+hdparm -T /dev/sda   : cached read performance
+hdparm -B /dev/sda   : set advanced power management
+hdparm -S /dev/sda   : set spindown timeout 
 
