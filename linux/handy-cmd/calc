@@ -19,6 +19,9 @@ From DEC to HEX
 ibase=16
 obase=8
 
+Form DEC to BIN
+obase=2
+
 II- dc calculator
 p : print stack
 c : clear stack

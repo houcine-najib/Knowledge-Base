@@ -61,12 +61,14 @@ mk2fs : -n = dry-run formatting paratition
              <feature>                      : override filesystem default features (/etc/mke2fs.conf)
         -T : usage type (small,big ....)
 tune2fs : can be used to adjust most of these parameters (may need to be unmounted)
+          -l = show block device informations
 
 Note: Number of disks in RAID is calculated : RAID 0  --> N
                                               RAID 1  --> N/2
                                               RAID 5  --> N-1
                                               RAID 10 --> N/2
 Stride size = [RAID chunk size] / [Filesystem block size]
+
 2) XFS
 # Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
 /sys/fs/xfs/<disk>
@@ -77,8 +79,10 @@ xfs_io -x -c "stat/statfs"   : get filesystem stats
 mkfs.xfs : -b : size=<bytes> filesystem block size (min 512,default 4kB,max 64KB )
            -d : agcount= number of allocation groups (number of CPUs)
                 agsize=<bytes> size of allocation group ( min 16 MB, max 1 TB)
-                sunit  = stripe unit (or chunk-size) of RAID array in 512-byte block / su (chunk-size in bytes)
-                swidth = stripe width of RAID array in 512-byte block (number of disks in raid * 512 )/ sw = number of disks in raid
+                sunit  = stripe unit (or chunk-size) of RAID array in 512-byte block 
+                       = su = chunk-size in bytes
+                swidth = stripe width of RAID array in 512-byte block (number of disks in raid * 512 )
+                       = sw = number of disks in raid
            -i : size   = inode size in bytes (default 256 ,max 2048)
                 maxpct = max % allocted to inode (default 25% <1TB, 5% <50TB,1% > 50TB)
            -l : internal = 1 internel log device,0 external log device

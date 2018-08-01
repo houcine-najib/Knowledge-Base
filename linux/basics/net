@@ -1,0 +1,178 @@
+I- Hardware
+#
+procfs : /proc/net/dev
+#
+ifconfig                      = display all up net dev with statistics(*)
+          <net_dev>           = display net_dev stats
+          -a                  = display all  net dev up/down 
+          -s                  = print stat summery
+          txqueuelen <length> = TX queue length (E.g: 10000 on 10 GbE )
+
+ethtool <net_dev>             = print device current settings
+        -s OPTIONS <net_dev>  = change device settings
+        -k <net_dev>          = show offload features 
+        -K <net_dev>          = change offload features  
+        -S <net_dev>          = query device statistics
+        -G <net_dev> <value>  = set ring buffer number
+
+# ethtool Options
+speed <value> duplex half|full autoneg on|off advertise <hex_code> wol p|u|m|b|a|g|s|d 
+  
+speed     : network device speed in Mb/s
+duplex    : set full or half duplex mode
+autoneg   : negotiate network for highest speed
+advertise : advertise autonegociate speed limit 
+wol       : wake on lan (p:PHY,a:ARP,d:Off)
+
+Note: ethtool options can be set via network device file /etc/sysconfig/network-scripts/ifcfg-* 
+using ETHTOOL QPTS="OPTIONS"
+
+#
+ip <options> link                 : for all net dev
+ip <options> link show <net_dev>  : only for net_dev
+                 
+options:    -s : print network statistics 
+            -a : all network devices
+            -d : more details 
+
+Note: "ip a" (shorcut for ip address ) show all network interfaces with ip addresses 
+
+II- Tuning
+
+1) Socket and TCP Buffers
+#Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/sysctl/net.txt
+
+net.core.wmem max: The core networking maximum socket receive/
+
+send (read/write) buffers
+ 
+
+net .ipv4. tcp_mem   min pressure max
+net .ipv4 . udp_mem
+
+
+net .ipv4. tcp_rmem min default max
+net .ipv4. tcp_wmem
+
+BDP (Bandwidth Delay Product) = Bandwidth * RTT (Round-Time Trip) 
+
+
+2) Other Kernel 
+
+Window Scaling : allow window size(unacknowledged data) to grow in size (default limit 64 KiB)
+# 
+net.ipv4.tcp_window_scaling = 1 enabled (default) | 0 disbaled
+
+Busy Polling :
+ 
+nstead of interrupting
+
+the kernel for every arrived packet, an interrupt is sent only when either a timer
+
+(polling) or a certain number of packets is reached
+
+This reduces the rate at which
+
+the kernel communicates with the NIC, allowing larger transfers to be buffered,
+
+resulting in greater throughput, though at some cost in latency
+
+# Specific Socket (with SO_BUSY_POLL set)
+net.core.busy_poll        
+#  globally
+net.core.busy_read
+
+TCP Backlog
+
+
+
+
+3) MTU (Maximum Transmission Unit)
+
+default MTU is 1500 bytes can be set up to 9000 bytes (Jumbo Frames) in network device configuraton file :
+
+in /etc/sysconfig/network-scripts/ifcfg-<net_dev> change MTU=<new_size> 
+
+4) Network Interrupt Handling
+
+RSS: Receive Side Scaling: for modern NICs that support multiple queues
+
+and can hash packets to different queues, which are in turn processed by different CPUs by interrupting them directly. This hash may be based on the IP
+
+address and TCP port numbers, so that packets from the same connection
+
+end up being processed by the same CPU.
+
+ RPS: Receive Packet Steering: a software implementation of RSS, for
+
+NICs that do not support multiple queues. This involves a short interrupt
+
+service routine to map the inbound packet to a CPU for processing. A similar
+
+hash can be used to map packets to CPUs, based on fields from the packet
+
+headers.
+
+ RFS: Receive Flow Steering: This is similar to RPS, but with affinity for
+
+where the socket was last processed on-CPU, to improve CPU cache hit rates
+
+and memory locality.
+
+ Accelerated Receive Flow Steering: This achieves RFS in hardware, for
+
+NICs that support this functionality. It involves updating the NIC with flow
+
+information so that it can determine which CPU to interrupt.
+
+ XPS: Transmit Packet Steering: For NICs with multiple transmit queues,
+
+this supports transmission by multiple CPUs to the queues.
+
+
+
+III- Link Aggregation
+
+IV- Benchmark
+
+1) qperf
+
+On Server:
+# listen on default port 19765
+qperf
+
+On Client
+# Test TCP Bandwidth for 60 s
+qperf -t 60 --use_bits_per_sec <server> tcp_bw
+# Test TCP Latency
+qperf -vvs <server> tcp_lat
+
+2) iperf
+
+iperf -s -l 128k
+
+This increased the socket buffer size to 128 Kbytes (-l 128k), from the default of
+
+8 Kbytes.
+
+ iperf -c 10.2.203.2 -l 128k -P 2 -i 1 -t 60
+
+ -c host: connect to the host name or IP address
+
+ -l 128k: use a 128 Kbyte socket buffer
+
+ -P 2: run in parallel mode with two client threads
+
+ -i 1: print interval summaries every second
+
+ -t 60: total duration of the test: 60 s
+
+
+(*)
+RX packets : packets has been received.
+TX packets : packets has been transmitted.
+errors     : errors when transmitting or receiving.
+dropped    : dropped packets when transmitting orreceiving.
+overruns   : times network device id not have enough buffer space to send or receive a packet.
+frame      : low-level Ethernet frame errors.
+carrier    : packets discarded because of link media failure (such as a faulty cable)

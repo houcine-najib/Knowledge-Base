@@ -14,10 +14,16 @@ set default at boot through kernel commandline : elevator=<type>
 set block device through  sysfs                : echo <elevator>  > /sys/block/<block_device>/queue/scheduler
 
 General Block Devices Parameters
+#
+blockdev --getra = get device readahead size in sectors
+         --getss = get sector size in bytes
+         --setra = set device readahed (in sectors)
+
 # Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/block/queue-sysfs.txt
 List of parameters in  /sys/block/<block_device>/queue/ : add_random, iostats, max_sectors_kb, nomerges, nr_requests,
                                                           read_ahead_kb, optimal_io_size, rq_affinity,
                                                           scheduler(elevator), rotational
+
 1) CFQ
 # Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/block/cfq-iosched.txt
 Use Case : scheduling classes (idle,best effort,real-time)

@@ -183,7 +183,7 @@ VIII- IPC
 Inter-Process-Communication are mechanisms provided by the kernel to allow processes to communicate with each other.
 These are the six primary IPC mechanisms available:
 
-1- Sockets       : Unix Domain Socket(NETLINK ,NETWORK) TCP/IP or UDP sockets to exchange data over the sockets.
+1- Sockets       : Unix Domain Socket (*) (NETLINK ,NETWORK) TCP/IP or UDP sockets to exchange data over the sockets.
 2- Pipes         : pipe is used for one way communication of a stream of bytes.
 3- Shared Memory : allows one process to share a region of memory in its address space with another. (fastest no  kernel intervention)
 4- Semaphores    : locking and synchronization mechanism used most widely when processes share resources.
@@ -219,3 +219,7 @@ ipcs  : list shared memory segment (-m), a semaphore (-s), or a message queue (-
 ipcrm : remove shared memory segment (-m), a semaphore (-s), or a message queue (-q)
 
 kernel.threads-max : system-wide maximum number of threads at one time.
+
+(*)
+Unix domain sockets (UDS) create a file on the file system for communication
+
