@@ -14,6 +14,7 @@ ethtool <net_dev>             = print device current settings
         -K <net_dev>          = change offload features  
         -S <net_dev>          = query device statistics
         -G <net_dev> <value>  = set ring buffer number
+        -i <net_dev>          = show device driver name
 
 # ethtool Options
 speed <value> duplex half|full autoneg on|off advertise <hex_code> wol p|u|m|b|a|g|s|d 
@@ -40,52 +41,62 @@ Note: "ip a" (shorcut for ip address ) show all network interfaces with ip addre
 II- Tuning
 
 1) Socket and TCP Buffers
-#Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/sysctl/net.txt
+#Documentation available in /usr/share/doc/kernel-doc-<version>/Documentation/sysctl/net.txt
+#Documentation available in /usr/share/doc/kernel-doc-<version>/Documentation/networking/ip-sysctl.txt
 
-net.core.wmem max: The core networking maximum socket receive/
-
-send (read/write) buffers
+# TCP Buffer Size Calculation
  
+BDP (Bandwidth Delay Product) = Bandwidth * RTT (Round-Time Trip)
 
-net .ipv4. tcp_mem   min pressure max
-net .ipv4 . udp_mem
+# Core networking maximum socket receive/send (read/write) buffers
+net.core.wmem max  = <BDP_in_bytes>
+net.core.rmem_max  = <BDP_in_bytes>
 
+Note: net.core.wmem_default and net.core.rmem_default are the default values
+# TCP receive/send (read/write) Buffer tunning
+min     : minimum memory in bytes for each tcp connection 
+default : default memory in bytes for each tcp connection
+max     : maximum memory in bytes for each tcp connection
 
-net .ipv4. tcp_rmem min default max
-net .ipv4. tcp_wmem
+net.ipv4.tcp_rmem = "min default max"
+net.ipv4.tcp_wmem = "min default max"
 
-BDP (Bandwidth Delay Product) = Bandwidth * RTT (Round-Time Trip) 
-
+Note: net.ipv4.tcp_mem and net.ipv4.udp_mem are systemwide memory limits for TCP and UDP connection in Pages (defaults are fine)
 
 2) Other Kernel 
 
-Window Scaling : allow window size(unacknowledged data) to grow in size (default limit 64 KiB)
-# 
-net.ipv4.tcp_window_scaling = 1 enabled (default) | 0 disbaled
-
-Busy Polling :
+i-Window Scaling 
+#
+Allow TCP window size (unacknowledged data) to grow in size (default limit 64 KiB, max 1 GiB)
  
-nstead of interrupting
+net.ipv4.tcp_window_scaling = 1 enabled (default) 
+                              0 disbaled
 
-the kernel for every arrived packet, an interrupt is sent only when either a timer
+Note: window size needs to be >= BW * RTT
 
-(polling) or a certain number of packets is reached
-
-This reduces the rate at which
-
-the kernel communicates with the NIC, allowing larger transfers to be buffered,
-
-resulting in greater throughput, though at some cost in latency
+ii-Busy Polling :
+# 
+An interrupt is sent only when either a timer (polling) or a certain number of packets is reached , instead of interrupt for every packet.
 
 # Specific Socket (with SO_BUSY_POLL set)
-net.core.busy_poll        
+net.core.busy_poll = <polling_timer>        
 #  globally
-net.core.busy_read
+net.core.busy_read = <polling_timer>
 
-TCP Backlog
+polling_timer:  50  us for a small number of sockets 
+                100 us for a large numbers of sockets
 
+iii-Network Interface
 
+Increase the size of the interface queue.
 
+ifconfig <net_dev> txqueuelen 10000 (for 10GbE)
+
+iv- Device Backlog
+#
+Length of the network device backlog queue, per CPU
+
+net.core.netdev_max_backlog = 10000 ( for 10 GbE)
 
 3) MTU (Maximum Transmission Unit)
 
@@ -93,45 +104,50 @@ default MTU is 1500 bytes can be set up to 9000 bytes (Jumbo Frames) in network 
 
 in /etc/sysconfig/network-scripts/ifcfg-<net_dev> change MTU=<new_size> 
 
-4) Network Interrupt Handling
 
-RSS: Receive Side Scaling: for modern NICs that support multiple queues
+4) Network Scaling Techniques
+#Documentation available in /usr/share/doc/kernel-doc-<version>/Documentation/networking/scaling.txt
 
-and can hash packets to different queues, which are in turn processed by different CPUs by interrupting them directly. This hash may be based on the IP
+Note: each receive queue has a separate IRQ associated with it.
 
-address and TCP port numbers, so that packets from the same connection
+i- Receive Side Scaling (RSS) : 
+#
+NICs with multiple queues distribute receive interrupts over CPUs , based on address and TCP port numbers.
+Configure each queue is mapped to each CPU : /sys/class/net/<net_dev>/queues/rx-<queue_num>/rss_cpus (bitmask,default 00 disabled) 
 
-end up being processed by the same CPU.
+ii- Receive Packet Steering (RPS) : 
+#
+Software RSS for NICs with no multiple queues support.(fewer hardware queues than CPUs)
+Configure single queue to all CPUs : /sys/class/net/<net_dev>/queues/rx-<queue_num>/rps_cpus (bitmask,default 00 disabled)
 
- RPS: Receive Packet Steering: a software implementation of RSS, for
+Note: When RPS is disbaled packets are processed on the interrupting CPU
 
-NICs that do not support multiple queues. This involves a short interrupt
+iii- Receive Flow Steering (RFS):
 
-service routine to map the inbound packet to a CPU for processing. A similar
+RPS with affinity for where the socket was last processed on-CPU, to improve CPU cache hit rates
+Configure RFS : /proc/sys/net/core/rps_sock_flow_entries = 32768
+                /sys/class/net/<dev>/queues/rx-<n>/rps_flow_cnt = rps_sock_flow_entries/<number_of_queues>
 
-hash can be used to map packets to CPUs, based on fields from the packet
+iv- Accelerated RFS : This achieves RFS in hardware, for
+#
+Packets are sent directly to a CPU that is local to the thread consuming the datais executing the application.(NIC hardware support)
 
-headers.
-
- RFS: Receive Flow Steering: This is similar to RPS, but with affinity for
-
-where the socket was last processed on-CPU, to improve CPU cache hit rates
-
-and memory locality.
-
- Accelerated Receive Flow Steering: This achieves RFS in hardware, for
-
-NICs that support this functionality. It involves updating the NIC with flow
-
-information so that it can determine which CPU to interrupt.
-
- XPS: Transmit Packet Steering: For NICs with multiple transmit queues,
-
-this supports transmission by multiple CPUs to the queues.
-
-
+v- Transmit Packet Steering (XPS) : 
+#
+For NICs with multiple transmit queues, this supports transmission by multiple CPUs to the queues.
+Configure each queue is mapped to each CPU : /sys/class/net/<net_dev>/queues/tx-<queue_num>/xps_cpus (bitmask,default 00 disabled)
 
 III- Link Aggregation
+
+1) Teamd Runners
+   
+ broadcast    : team device transmits packets via all ports.
+ roundrobin   : team device transmits packets in a round-robin fashion.
+ activebackup : watches for link changes and selects active port to be used for data transfers.
+ loadbalance  : monitors traffic and uses a hash function to try to reach a perfect balance
+ lacp         : 802.3ad Link Aggregation Control Protocol
+
+
 
 IV- Benchmark
 
@@ -149,23 +165,16 @@ qperf -vvs <server> tcp_lat
 
 2) iperf
 
+On Server:
+# listen on default port 5001, with buffer size of 128K instead of default 8 KB
 iperf -s -l 128k
 
-This increased the socket buffer size to 128 Kbytes (-l 128k), from the default of
-
-8 Kbytes.
-
- iperf -c 10.2.203.2 -l 128k -P 2 -i 1 -t 60
-
- -c host: connect to the host name or IP address
-
- -l 128k: use a 128 Kbyte socket buffer
-
- -P 2: run in parallel mode with two client threads
-
- -i 1: print interval summaries every second
-
- -t 60: total duration of the test: 60 s
+On Client:
+iperf -c <server> -l 128k -P 2 -i 1 -t 60
+#
+-P 2: run in parallel mode with two client threads
+-i 1: print interval summaries every second
+-t 60: total duration of the test: 60 s
 
 
 (*)
