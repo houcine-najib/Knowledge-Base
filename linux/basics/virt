@@ -1,7 +1,73 @@
-
-
 I- Monitor KVM Performance
-1) Perf
- 
+Step-1: Copy guest modules and kallsyms to temporary location
 
-III- Tuned
+cat /proc/modules > /tmp/modules
+cat /proc/kallsyms > /tmp/kallsyms
+
+Step-2: Copy these files to the host 
+
+Step-3: Record host and guest performance
+
+perf kvm --host --guest --guestkallsyms=guest-kallsyms --guestmodules=guest-modules record -a -o perf.data
+
+Step-4: Analyze performance data
+
+perf kvm --host --guest --guestmodules=guest-modules report -i perf.data.kvm --force > analyze
+
+II- Tuned
+#
+virtual-guest : profile recommended for virtual guest
+virtual-host  : profile recommended for virtual host (KVM and RHV)
+
+III- Tunning
+#
+Note: Virtual Machine XML COnfiguration located under /etc/libvirt/qemu/VM-NAME.xml
+
+1) Block IO
+#
+View   VM blkio settings : virsh blkiotune  <virtual_machine> 
+View   VM disk devices   : virsh domblklist <virtual_machine>
+Change VM blkio settings : virsh blkiotune  <virtual_machine> --weigth <IO_weight> --device_weight </path/to/device,weight> --config 
+                                                                         100-1000                    per-device IO Weight     persist
+
+Limit  VM Disk IO        :  virsh blkdeviotune <virtual_machine> <device> --<limit_name> <limit_value>
+                            device       : target device name or source file name
+                            --limit_name : --device-read-iops-sec,--device-write-iops-sec,--device-read/write-bytes-sec,     
+
+2) CPU and NUMA
+#
+View   VM NUMA settings    : virsh numatune <virtual_machine>
+Change VM NUMA settings    : virsh numatune <virtual_machine> --mode <strict,prefrred,interleave> --nodeset <node_list> --config
+#
+View   VM CPU settings     : virsh vcpuinfo <virtual_machine> 
+Pin    VM vCPU to CPU      : virsh vcpupin <virtual_machine> <vcpu_number> <cpu_list> --config
+                             vcpu_number  : one vcpu number 
+                             cpu_list     : physical cpu list , comma sperated and dash range
+3) Sheduler
+#
+View   VM Sheduler  settings   : virsh schedinfo <virtual_machine>
+Change VM Scheduler settings   : virsh schedinfo <virtual_machine> cpu_shares=0-262144 --config
+
+4) Memory
+#
+View   VM Memory  settings   : virsh memtune <virtual_machine>
+Change VM Memory  settings   : virsh memtune <virtual_machine> -<limit_name> <limit_value>  --config
+                               --hard-limit      : maximum memory (KiB)
+                               --soft-limt       : limit during memory contention (KiB)
+                               --swap-hard-limit : maximum memory plus swap (KiB)
+                               --min-guarantee   : guaranteed minimum memory (KiB)
+VM Memory XML Configuration :
+#
+<memoryBacking>
+
+<locked/>         : pages not swapped by host
+<nosharepages/>   : pages not merged  by host
+<hugepages/>      : use huge pages on host
+
+</memoryBacking>
+
+IV- KERNEL SAME-PAGE MERGING :KSM
+
+
+
+/usr/share/doc/libvirt-python-<version>/examples/*.py

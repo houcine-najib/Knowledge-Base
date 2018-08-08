@@ -59,8 +59,10 @@ In order to set hugepages  : sysctl -w vm.nr_hugepages=xx or vm.nr_hugepages=xx 
       
 Note: Restart the system after configuring hugepages for chances of having free contiguous memory.
 
-Kernel commandline  : hugepages= 
-                      hugepagesz= 2MB default /hardware dependent
+Kernel commandline  : default_hugepagesz =  default huge page size
+                      hugepagesz         = 2MB/1GB
+                      hugepages          = number of pages of pervious hugepagesz 
+
 vm.nr_overcommit_hugepages : number of huge pages from normal page if huge page exhausted. 
 
 2- THP

@@ -6,8 +6,8 @@ Each CPU has uniform access latency to all of memory, via a shared system bus.
 Non-Uniform Memory Access(NUMA) : 
 Each CPU has a dedicated area of memory combained referred to as NUMA  Node.
 
-
 /sys/devices/system/node : NUMA nodes infos , and relative distances between those nodes.
+
 Example : per node hugepages   : cat /sys/devices/system/node/*/hugepages/hugepages-2048kB/*
           NUMA stat            : cat /sys/devices/system/node/*/numastat
           per node memory info : cat /sys/devices/system/node/*/meminfo
@@ -15,17 +15,25 @@ Example : per node hugepages   : cat /sys/devices/system/node/*/hugepages/hugepa
 Node Distance : hardcoded values set by motherboard manufacturer exposed to OS by ACPI to determine the relative distance
 between any 2 NUMA nodes 
 Distances range from 10 (fastest) to 254 (25.4 slower) 255 for no NUMA connection.
+
+II- NUMASTAT
 #
 numastat : tool for  memory statistics on a per-NUMA-node basis. 
-	    numa_hit       : number of pages that were successfully allocated to this node.
+	    
+            numa_hit       : number of pages that were successfully allocated to this node.
 	    numa_miss      : number of pages that were allocated on this node because of low memory on the intended node.
 	    numa_foreign   : number of pages initially intended for this node that were allocated to another node instead. 
 	    interleave_hit : number of interleave policy pages successfully allocated to this node.
 	    local_node     : number of pages successfully allocated on this node, by a process on this node.
 	    other_node     : number of pages allocated on this node, by a process on another node.
 
+numastat                       : system-wide numa statistics
+numastat <PID> or <pattern>    : per-node process memory usage (in MBs) for <PID> or list of process <pattern>
 numastat -m                    : cat /sys/devices/system/node/*/meminfo
-numastat -p <PID> or <pattern> :  per-node process memory usage (in MBs) for <PID> or list of process <pattern> 
+numastat -p <PID> or <pattern> : per-node process memory usage (in MBs) for <PID> or list of process <pattern> 
+numastat -c                    : add total column
+
+III- NUMACTL
 #
 numactl  : set the processor affinity and memory affinity of a process.
 
@@ -36,12 +44,16 @@ numactl  : set the processor affinity and memory affinity of a process.
  --localalloc  = process  memory should always be allocated from the local node.
  --preferred   = preferred node from which to allocate memory.
  --show        = current process NUMA policy.
+
+IV- NUMA Load Balancing
 #
-NUMA Load Balancing : 
-#
-sysctl kernel.numa_balancing=enable/disable ( enabled by default : /proc/sys/kernel/numa_balancing) 
+sysctl  kernel.numa_balancing            = 0 disable
+        /proc/sys/kernel/numa_balancing  = 1 enabled (multiple nodes )
+ 
 kernel boot commandline : numa_balancing=enable/disable
 kernel boot commandline : numa=off (completly disbale numa)
+
+V- NUMAD
 #
 numad        NUMA affinity management daemon dynamically improve NUMA resource allocation.
                = -i time interval that numad waits between system scans,default 15s.

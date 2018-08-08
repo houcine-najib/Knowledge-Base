@@ -12,7 +12,7 @@ modinfo  -p : parameters only
 # Method-1 : On loading
 modprobe <modulename> <module_parameter>=<value>
 # Method-2 : At runtime parameter file must be writable
-echo <value> /sys/module/modulena/ne/parameters/parametername
+echo <value> /sys/module/<module_name>/parameters/<parameter_name>
 # Method-3 : Persisent .conf file in /etc/modprobe.d/ directory
 # eg: /etc/modprobe/my_module.conf 
 # Syntax 
