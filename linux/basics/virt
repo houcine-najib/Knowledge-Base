@@ -14,6 +14,8 @@ Step-4: Analyze performance data
 
 perf kvm --host --guest --guestmodules=guest-modules report -i perf.data.kvm --force > analyze
 
+Note: /usr/share/doc/libvirt-python-<version>/examples/*.py contain  moitoring scripts
+
 II- Tuned
 #
 virtual-guest : profile recommended for virtual guest
@@ -62,12 +64,29 @@ VM Memory XML Configuration :
 
 <locked/>         : pages not swapped by host
 <nosharepages/>   : pages not merged  by host
-<hugepages/>      : use huge pages on host
+<hugepages/>      : use static huge pages on host
 
 </memoryBacking>
 
-IV- KERNEL SAME-PAGE MERGING :KSM
+IV- Kernel Same-page Merging : KSM
+# Documentation available in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/vm/ksm.txt
+Note: It's recommended to disable KSM before enabling THP
 
+ksm service        : control ksm daemon (kmsd)
+Configuration file : /etc/sysconfig/ksm
+KSM_MAX_KERNEL_PAGES = maximum number of unswappable kernel pages
+                     = default 1/2 total memory 
+                     = 0 unlimited                                                     
 
+ksmtuned service   : tune and control ksm service
+Configuration file : /etc/ksmtuned.conf
+KSM_NPAGES         = pages ksm will scan before the ksmd becomes inactive (/sys/kernel/mm/ksm/page_to_scan)
 
-/usr/share/doc/libvirt-python-<version>/examples/*.py
+ksm daemon is controlled by sysfs files in /sys/kernel/mm/ksm/ :
+
+ pages_to_scan      = pages to scan in one cycle
+ sleep_millisecs    = sleep between cycles
+ merge_across_nodes = NUMA nodes pages merge ( 0 merge on same node) 
+ run                = 0  = stop  kmsd and keep merged pages
+                      1  = start kmsd
+                      2  = stop  kmsd and unmerge pages

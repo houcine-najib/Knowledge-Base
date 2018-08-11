@@ -248,7 +248,6 @@ iperf -c <server> -l 128k -P 2 -i 1 -t 60
 -i 1: print interval summaries every second
 -t 60: total duration of the test: 60 s
 
-
 (*)
 RX packets : packets has been received.
 TX packets : packets has been transmitted.
