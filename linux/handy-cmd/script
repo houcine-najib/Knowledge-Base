@@ -1,0 +1,2 @@
+script : record shell session input and output to typescript
+         -a = append to file or a typescript

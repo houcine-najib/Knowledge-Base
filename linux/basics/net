@@ -151,11 +151,11 @@ III- Link Aggregation
 
 i- Create new team interface:
 #
-nmcli con add type team con-name <team_name> ifname <team_ifname> '<JSON_config>'
+nmcli con add type team con-name <team_name> ifname <team_ifname> team.config '<JSON_config>'
 
 team_name   : team or connection name (if not specified, get derived from IFNAME)
 team_ifname : team interface name 
-JSON_CONFIG : JSON configuration string or file (without quotes) , E.g:'{"runner": {"name": "TYPE" } }' (see man teamd.conf)
+JSON_CONFIG : JSON configuration string or file  E.g:'{"runner": {"name": "TYPE" } }' (see man teamd.conf)
 
 Configuration file will be created : /etc/sysconfig/network-scripts/ifcfg-<team_name>
 
@@ -214,12 +214,12 @@ Note: Exmaples can be found in : /usr/share/doc/teamd-*/example_ifcfg/*/
 4) Monitor and Troubleshoot team interface
 #
 Display current state of team interface : teamdctl <team_name> state veiw -v
-Dump   current state of team interface    : teamdctl <team_name> state dump
-Dump   configuration of team interface    : teamdctl <team_name> config dump
-Disply team ports    of team interface    : teamnl   <team_name> ports
-Get    activeport    of team interface    : teamnl   <team_name> getoption activeport
-Set    activeport    of team interface    : teamnl   <team_name> setoption activeport <port_id>
-View   available options                  : teamnl   <team_name>  options
+Dump   current state of team interface    : teamdctl <team_device> state dump
+Dump   configuration of team interface    : teamdctl <team_device> config dump
+Disply team ports    of team interface    : teamnl   <team_device>   ports
+Get    activeport    of team interface    : teamnl   <team_device>   getoption activeport
+Set    activeport    of team interface    : teamnl   <team_device>   setoption activeport <port_id>
+View   available options                  : teamnl   <team_device>   options
 
 IV- Benchmark
 

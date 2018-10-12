@@ -1,4 +1,4 @@
-tee  : copy standard input to fiel, and also to standard output.
+tee  : copy standard input to file, and also to standard output.
 
 tee  -a --append              
      -i --ignore-interrupts 
