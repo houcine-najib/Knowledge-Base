@@ -23,6 +23,11 @@ sar [options] [ interval [ count ]
     -o   : save output to file
     -f   : read from file    
 
+5) Cron Configuration
+
+Set by default to collect sysstat data every 10 minutes
+Cron file           : /etc/cron.d/sysstat 
+
 II- CPU & Scheduler 
 
 1) CPU Usage

@@ -26,7 +26,7 @@ advertise : advertise autonegociate speed limit
 wol       : wake on lan (p:PHY,a:ARP,d:Off)
 
 Note: ethtool options can be set via network device file /etc/sysconfig/network-scripts/ifcfg-* 
-using ETHTOOL QPTS="OPTIONS"
+using ETHTOOL_OPTS="OPTIONS"
 
 #
 ip <options> link                 : for all net dev
@@ -53,10 +53,11 @@ net.core.wmem max  = <BDP_in_bytes>
 net.core.rmem_max  = <BDP_in_bytes>
 
 Note: net.core.wmem_default and net.core.rmem_default are the default values
+
 # TCP receive/send (read/write) Buffer tunning
 min     : minimum memory in bytes for each tcp connection 
 default : default memory in bytes for each tcp connection
-max     : maximum memory in bytes for each tcp connection
+max     : maximum memory in bytes for each tcp connection (cannot exceed net.core.r/wmem_max ) 
 
 net.ipv4.tcp_rmem = "min default max"
 net.ipv4.tcp_wmem = "min default max"
@@ -98,9 +99,20 @@ Length of the network device backlog queue, per CPU
 
 net.core.netdev_max_backlog = 10000 ( for 10 GbE)
 
+v- Half Open TCP 
+
+net.ipv4.tcp_max_syn_backlog = 4096
+
+vi- Fast TCP Open
+
+net.ipv4.tcp_fastopen = 1 client-side
+                        2 server-side
+                        3 both-sides
+
 3) MTU (Maximum Transmission Unit)
 
 default MTU is 1500 bytes can be set up to 9000 bytes (Jumbo Frames) in network device configuraton file :
+
 
 in /etc/sysconfig/network-scripts/ifcfg-<net_dev> change MTU=<new_size> 
 
@@ -195,13 +207,13 @@ ONBOOT=yes
 BOOTPROTO=none
 IPADDR=192.168.11.1
 PREFIX=24
+GATEWAY=192.168.1.1
 TEAM_CONFIG='{"runner": {"name": "activebackup"}, "link_watch": {"name":"ethtool"}}'
 
 Create port ifcfg to be a member of team interface  /etc/sysconfig/network-scripts/ifcfg-<team_port>
 E.g:
 DEVICE=eth1
 HWADDR=D4:85:64:01:46:9E
-DEVICETYPE=TeamPort
 ONBOOT=yes
 TEAM_MASTER=team0
 TEAM_PORT_CONFIG='{"prio":100}'
