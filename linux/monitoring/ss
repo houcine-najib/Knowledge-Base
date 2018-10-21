@@ -1,0 +1,12 @@
+ss : Socket Stat 
+ss -tmpie ( commun use )
+    -t = TCP Socket
+    -m = socket memory usage
+    -p = socket process
+    -i = TCP internal infos
+    -e = socket detailed infos
+    -l = listening socket
+    -a = all socket 
+    -n = No resolve (address/ports)
+    -r = resolve (address/ports)
+    -s = summary

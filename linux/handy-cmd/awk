@@ -32,14 +32,14 @@ awk 'BEGIN {FS="\n";OFS=";";RS="\r";ORS="\n"}'  <input_file>
      OFS = Output Field SPerator
      RS  = Record Speratot
      ORS = Output Record Sperator
+     NR  = Number Record (Current)
 
 Variables
      $NF     = Last  Field ( Total Number of Fileds) 
      $1      = First Field
      $2      = Second Field
      $(NF-1) = One before last Field 
-     $0      = Whole Record
-     $NR     = Number of Records            
+     $0      = Whole Record           
   
 FILENAME = Name of input file
 FNR      = Number of Records for each file     
