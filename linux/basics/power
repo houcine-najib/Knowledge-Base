@@ -75,7 +75,7 @@ systctl -w vm.laptop_mode = 5
 
 VIII- Audio
 # Set idle power save timeout to 10 seconds
-/etc/modprobe/audio_powersave.conf
+/etc/modprobe.d/audio_powersave.conf
 options snd_ac97_codec power_save=10
 options snd_hda_intel  power_save=10
 
