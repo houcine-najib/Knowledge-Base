@@ -22,7 +22,10 @@ virtual-guest : profile recommended for virtual guest
 virtual-host  : profile recommended for virtual host (KVM and RHV)
 
 III- Tunning
-#
+
+# List all Domains/KVM VMs
+virsh list --all
+
 Note: Virtual Machine XML COnfiguration located under /etc/libvirt/qemu/VM-NAME.xml
 
 1) Block IO
@@ -36,10 +39,12 @@ Limit  VM Disk IO        :  virsh blkdeviotune <virtual_machine> <device> --<lim
                             device       : target device name or source file name
                             --limit_name : --device-read-iops-sec,--device-write-iops-sec,--device-read/write-bytes-sec,     
 
+Note: --total-bytes-sec must be set for each other paramter
+
 2) CPU and NUMA
 #
 View   VM NUMA settings    : virsh numatune <virtual_machine>
-Change VM NUMA settings    : virsh numatune <virtual_machine> --mode <strict,prefrred,interleave> --nodeset <node_list> --config
+Change VM NUMA settings    : virsh numatune <virtual_machine> --mode <strict,preferred,interleave> --nodeset <node_list> --config
 #
 View   VM CPU settings     : virsh vcpuinfo <virtual_machine> 
 Pin    VM vCPU to CPU      : virsh vcpupin <virtual_machine> <vcpu_number> <cpu_list> --config

@@ -9,13 +9,15 @@ II-Runtime Device Power Management (RDPM) filesystem : /sys/devices/<device>/pow
 /sys/devices/<device>/power/control = auto : RDPM enabled if supported
                                     = on   : disbale driver from managing device power state
 #
-/sys/devices/<device>/power autosuspend_delay_ms = device idle period in ms before suspending it 
-                                                   -1 disable autosuspend   
+/sys/devices/<device>/power/autosuspend_delay_ms = device idle period in ms before suspending it 
+                                                 = -1 disable autosuspend   
 #
-/sys/bus/usb/devices/*/power  autosuspend = 1 enable  autosuspend
-                                            0 disable autosuspend
+/sys/bus/usb/devices/*/power/autosuspend = 1 enable  autosuspend
+                                           0 disable autosuspend
 # Enable autosuspend for all USB devices
-for i in /sys/bus/usb/devices/*/power ; do echo 1 > $i ; done
+
+for i in /sys/bus/usb/devices/*/power/autosuspend ; do echo 1 > $i ; done
+
 III-File System 
 # mount filesystem with relatime option
 
