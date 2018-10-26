@@ -15,9 +15,9 @@ tuna --cpus=cpu_list --threads=thread_list --move
 # Spread Thread List  accross CPU List Equaly
 tuna --cpus=0,1 --threads=dd\* --spread
 # IRQ Affinity
-tuna irqs=irqlist --cpus=cpulist --move
+tuna --irqs=irqlist --cpus=cpulist --move
 # Spread IRQs List  accross CPU List Equaly
-tuna irqs=irqlist --cpus=cpulist --spread
+tuna --irqs=irqlist --cpus=cpulist --spread
 # Tasks Affinity
 tuna --threads=pid_or_cmd_list --priority=[policy:]rt_priority
 # Policy   = RR,FIFO,OTHER(Default)

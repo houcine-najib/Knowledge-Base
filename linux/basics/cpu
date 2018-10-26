@@ -45,7 +45,9 @@ III- CPU Frequency Policy :Governer
 CPU Governer set cpu-freq policy based on frequency limits : scaling_max_freq
                                                              scaling_min_freq 
 
-These limits(default lspcu values) ,available as files in /sys/bus/cpu/devices/cpu#/cpufreq/ 
+These limits(default lspcu values) ,available as files in  /sys/bus/cpu/devices/cpu#/cpufreq/ 
+                                                       or  /sys/devices/system/cpu/cpu#/cpufreq
+
 These files are  writable by echoing allowing CPU OC(OverClocking BIOS).
 #
 Available governers can be listed in scaling_available_governors file :
@@ -139,8 +141,13 @@ VI- CPU Affinity:
 
 Pining process to cpu or cpu affinity of process.
 
-taskset -c <comma,spearte-dash range cpu> -- <command> 
-taskset -c <comma,spearte-dash range cpu> -- <pid>
+taskset -c  <comma,spearte-dash range cpu>  <command> 
+taskset -p  <cpu_mask> <pid> 
+taskset -pc <comma,spearte-dash range cpu> <pid>
+
+Show process pining
+
+taskset -p <pid>
 
 Notes: taskset is not NUMA-aware.
        systemd cpu affinity is preferred on taskset.

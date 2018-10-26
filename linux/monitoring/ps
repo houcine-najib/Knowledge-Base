@@ -8,6 +8,9 @@ ps  <PID>
          -u,-U|U            : select by user name
          -p|p               : select by pid
 
+E.g: ps -pf 
+     ps -up 
+
 Note: BSD options : without dash , UNIX options with dash
 
 PS Options

@@ -65,6 +65,12 @@ Kernel commandline  : default_hugepagesz =  default huge page size
 
 vm.nr_overcommit_hugepages : number of huge pages from normal page if huge page exhausted. 
 
+Hugepages File System (hugetlbfs)
+In case application use mmap system call hugepages must be mounted :
+
+mount -t hugetlbfs none /largepage 
+
+
 2- THP
 
 Enable/Disable at Runtime  /sys/kernel/mm/transparent_hugepage/enabled
@@ -111,7 +117,7 @@ Create SWAP partition
 1) fdisk /dev/sdd ; n : create partition ; t : change partition system id to 82 (Linux swap / Solaris)
 2) mkswap /dev/sdd 
 3) swapon /dev/sdd -p 1 
-4) add entries in /etc/fstab : /dev/sdd swap swap sw,pri=1 0 0
+4) add entries in /etc/fstab : /dev/sdd none swap sw,pri=1 
 5) turn off all swap space : swapoff -a
 6) mounts all swap spaces in /etc/fstab : swapon -a 
 
@@ -129,7 +135,7 @@ swappiness=0      aggressively avoids swapping out (increases OOM risk under str
 swappiness=<high> aggressively swapping less active processes out of physical memory.
 swappiness=<low>  avoids swapping processes out of memory (decreases latency).
 
-V- Memory Over Coommitement
+V- Memory Over Commitement
 Linux provisions more memory (both RAM and Swap) than it has available. 
 
 overcommitt parameters : sysctl vm.overcommit_memory : /proc/sys/vm/overcommit_memory
