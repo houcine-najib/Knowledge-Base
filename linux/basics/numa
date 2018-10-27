@@ -43,8 +43,9 @@ numactl  : set the processor affinity and memory affinity of a process.
  --phycpubind  = process and childs execute only on the specified CPU .Syntax: numactl --phycpubind=<cpus> <process>
  --localalloc  = process  memory should always be allocated from the local node.
  --preferred   = preferred node from which to allocate memory.
+ --interleave  = inteleave accross nodes  
  --show        = current process NUMA policy.
-
+ 
 IV- NUMA Load Balancing
 #
 sysctl  kernel.numa_balancing            = 0 disable

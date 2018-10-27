@@ -26,6 +26,8 @@ vm.vfs_cache_pressure (/proc/sys/vm/cache_pressure) = controls kernel directory 
                                                     = <100 : perfer cache
                                                     = 0    : always cache
                                                     = >100 : perfer reclaim
+vm.page-cluster
+
 2) XFS  
 # Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
 fs.xfs.xfssyncd_centisecs   (Min: 100 Default:3000 Max:720000) interval at which the xfssyncd thread flushes metadataout to disk.

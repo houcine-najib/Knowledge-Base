@@ -31,7 +31,6 @@ echo $(($(getconf _PHYS_PAGES) * $(getconf PAGE_SIZE) / (1024 * 1024)))
 Virtual memory available in MB:
 echo $(($(getconf _AVPHYS_PAGES) * $(getconf PAGE_SIZE) / (1024 * 1024)))
 
-
 Compaction
 All zones can be compacted such that free memory is available in contiguous blocks where possible by:
 
@@ -142,7 +141,7 @@ overcommitt parameters : sysctl vm.overcommit_memory : /proc/sys/vm/overcommit_m
                          sysctl vm.overcommit_ratio  : /proc/sys/vm/overcommit_ratio
 
 vm.overcommit_memory : 
-0 = heuristic overcommit (1/3 ~ 3% of free reserved for root)
+0 = heuristic overcommit (1/33 ~ 3% of free reserved for root)
 1 = always overcommit 
 2 = strict overcommit limited by overcommit_ratio. ( CommitLimit in /proc/meminfo) (1/32 ~ 3% of real memory reseverd for root)
 
@@ -173,6 +172,7 @@ vm.oom_kill_allocating_task = specify task to for oom_kill
                                                 = -16..15 multiply oom_score * 2 ^ oom_adj
 /proc/<PID>/oom_score_adj : adjust oom score (add the value) 
                             -1000 ... 1000
+
 force the OOM killer      :  echo f > /proc/sysrq -trigger highest oom_score process will be killed.
 
 VII- Memory Reclamition
@@ -183,6 +183,7 @@ vm.dirty_expire_centisecs    : age in 1/100th of a sec the dirty pages must be b
 vm.dirty_writeback_centisecs : kernel BDI-flush thread frequency
 vm.dirty_background_ratio    : % dirty memory before sync.
 vm.dirty_ratio               : % dirty memory before block all writes IO and sync.
+vm.min_free_kbytes           : force VM to keep a minimum amount of memory free (KiB)
 
 2) Cache :
 See fs
@@ -208,10 +209,10 @@ kernel.shmall  : /proc/sys/kernel/shmall : the max size of shared memory in page
 
 Semaphore
 kernel.sem     : /proc/sys/kernel/sem	<SEMMSL> <SEMMNS> <SEMOPM> <SEMMNI>
-SEMMSL	the max number of semaphores per identifier
-SEMMNS	the max value of a semaphore
+SEMMSL	the max number of semaphores per identifier/array
+SEMMNS	the max number of semaphores system wide
 SEMOPM	the max number of operations per semaphore call
-SEMMNI	the max number of semaphore sets in the entire system
+SEMMNI	the max number of semaphore arrays 
 
 Message Queue
 kernel.msgmni /proc/sys/kernel/msgmni	: the number of message queue identifiers
