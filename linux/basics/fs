@@ -26,7 +26,8 @@ vm.vfs_cache_pressure (/proc/sys/vm/cache_pressure) = controls kernel directory 
                                                     = <100 : perfer cache
                                                     = 0    : always cache
                                                     = >100 : perfer reclaim
-vm.page-cluster
+
+vm.page-cluster                                     = swap page readahed ( power of 2)
 
 2) XFS  
 # Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
@@ -37,8 +38,8 @@ fs.xfs.age_buffer_centisecs (Min: 100 Default:1500 Max:720000) age at which xfsb
 III- Format Options
 # 
 /proc/filesystems : all filesystems registered to the kernel ( nodev : without persistent storage device)
-/proc/mounts      : list of all currently mounted filesystem (/proc/mtab).
-/proc/fstab       : list of all mounts entries.
+/proc/mounts      : list of all currently mounted filesystem (/etc/mtab).
+/etc/fstab        : list of all mounts entries.
 #
 df      -aTh      : list all filesystems with type and usage Bytes (-i for inode usage).    
 findmnt -a        : tree list all mounted filesytems or search for a filesystem.
@@ -50,18 +51,21 @@ lsblk   -af       : list all block devices and corresponding mount points.
 
 # Configurations in /etc/mke2fs.conf
 mk2fs : -n = dry-run formatting paratition
-        -N = specify inode size (Default 256)
+        -I = specify inode size (Default 256)
         -b = block size : 1024,2048 or 4096
-        -i = inode for every bytes-per-inode bytes 
-        -I = inode size in bytes (Default 256)
-        -E : stride       = stride-size =  RAID chunk-size / Block Size
+        -i = bytes for every inode (bytes-per-inode)
+        -N = number of inodes 
+        -E : stride       = stride-size  = RAID chunk-size / Block Size
              stripe_width = stripe-width = RAID Number of disks * stride
              discard :  discard blocks at mkfs (disbale nodiscard) 
         -J : size   = internel journal size in MB
              device = device of external journal (also label or uuid)
-        -O : journal_dev <external-journal> : create externel journal prior to mounting. 
+      
+        -O : journal_dev <external-journal> : create externel journal in device prior to mounting. 
              <feature>                      : override filesystem default features (/etc/mke2fs.conf)
+      
         -T : usage type (small,big ....)
+
 tune2fs : can be used to adjust most of these parameters (may need to be unmounted)
           -l = show block device informations
 
@@ -121,7 +125,7 @@ mount -t ext4 -o    journal_path/journal_dev    = external journal path/device (
                                      writeback = metadata written asynchronously from the corresponding data (highest-throughput)
                                      kernel boot commandline : rootflags=data=<mode>
                     barrier=1/barrier=0 = barrier/nobarrier|
-                    stripe              = number of RAID disks * chunk size  
+                    stripe              =  RAID5/6 data disks * ( chunk size / block size)  
                     norecovery/noload  
                     discard/nodiscard
                     commit              = sync all data and metadata every nrsec seconds (default 5s)
@@ -146,8 +150,10 @@ Example: filefrag -v /mnt/fsfrag/largefile
 #
 e2fsck     = report the percentage of fragmented files
 Example: e2fsck -fn /dev/sdb1 (should be umounted ?)
+
 e2freefrag = report free space fragmentation
 Example: e2freefrag /dev/sdb1 (debugfs: freefrag)
+
 e4defrag   = defragmentation tool
 Exmaple: e4defrag -v  <target> : target can be file,directory,device
          e4defrag -c  <target> : suggest defragmenation or not (no defrag)
@@ -155,8 +161,10 @@ Exmaple: e4defrag -v  <target> : target can be file,directory,device
 #
 xfs_db  = report a fragmentation factor for device
 Example: xfs_db -c frag -r /dev/sda1
+
 xfs_bmap = report a fragmentation factor for file
 Exmaple: xfs_bmap -v /mnt/fsfrag/largefile
+
 xfs_fsr  = defragmentation tool
 Exmaple: xfs_fsr -v <target> : target can be file,device
          xfs_fsr -v          : defrag all xfs mounts (-t specifiy time in seconds ; default 7200s)
