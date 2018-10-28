@@ -1,0 +1,19 @@
+F : Toggle Fields
+
+M : Sort Memory
+P : Sort CPU
+T : Sort Time
+N : Sort PID 
+
+x : Blod Sort
+b : Highlight Sort
+
+R : Reverse Sort
+
+d : Change Delay
+
+1 : Display All Cores
+
+o/O    : Filter <Filed> <=,>,<,!...> <value>
+Ctrl+o : Display Current Filter
+" = "  : Clear Filter

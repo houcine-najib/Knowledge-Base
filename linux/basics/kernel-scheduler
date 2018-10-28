@@ -44,6 +44,8 @@ Latency     = Delay between the time a process is scheduled to run and the actua
 Granularity = ( latency / NORT ) - ( latencty / NORT / NORT ) where NORT : is the number of running tasks.
 
 CFS parameters : sysctl or /proc/sys/kernel
+# Documentation available in  /usr/share/doc/kernel-doc-<kernel-version>/Documentation/scheduler/sched-rt-group.txt 
+                                                                                                 sched-design-CFS.txt
 
 sched_latency_ns             = delay between process scheduling and execution
                              = scheduler run a task  from the queue once  during the epoch 
@@ -52,7 +54,7 @@ sched_latency_ns             = delay between process scheduling and execution
 
 sched_min_granularity_ns     = granularity of sched_latency_ns  
 
-sched_wakeup_granularity_ns  = wake-up preemption,ability for woken tasks with higher pririty to preemt current running task
+sched_wakeup_granularity_ns  = wake-up preemption,ability for woken tasks with higher priority to preemt current running task
                                High : reduces wake-up preemption, reducing disturbance of compute bound tasks.
                                Lower: improves wake-up latency and throughput for latency critical tasks.
 sched_migration_cost_ns      =  If the real run time of the task is less than this value, 
@@ -62,7 +64,9 @@ sched_migration_cost_ns      =  If the real run time of the task is less than th
                                 Increase: if tasks bounce between CPUs/Nodes too often
 
 sched_rt_period_us           = period over which real-time tasks measured. Default: 1,000,000 µs                         
-sched_rt_runtime_us          = quantum allocated to real-time tasks during sched_rt_period_us (-1 disabled). Default: 950,000 µs 
+sched_rt_runtime_us          = quantum allocated to real-time tasks during sched_rt_period_us (default: 950,000 µs)
+                             = -1 disable : no time for non-rt task
+                                0         : no time for rt tasks
 
 sched_rt_period_us - sched_rt_runtime_us = time for non-real time tasks.
 
@@ -113,7 +117,7 @@ top         RT -99     ...    -2 -1  0     1    ...  20     ...        38  39
 
 ps         139 138     ...           39   40    ...  19     ...         1   0
                                    <-----                                  
-
+                                                                         
 
 Setting or Changing Process Priority : 
 
@@ -128,13 +132,23 @@ chrt -m = minimum and maximum valid priorities for each scheduling algorithm.
 
 chrt <scheduler> <priority> <command>
 
+chrt -p  <scheduler> <priority> <PID>
+
 -b = SCHED_BATCH
 -f = SCHED_FIFO
 -i = SCHED_IDLE
 -o = SCHED_OTHER
 -r = SCHED_RR     = DEFAULT (if <scheduler> not set)
 
-chrt -p  <scheduler> <priority> <PID>
+VI- Systemd Scheduling
+Set systemd units CPU scheduling policy and priority
+#
+CPUSchedulingPolicy      = other, batch, idle,fifo or rr
+CPUSchedulingPriority    = 1 lowest .. 99 highest 
+
+only RT Policies rr,fifo can set priority , others have static priority set to 0
+
+CPUSchedulingPolicy and CPUShares/CPUAccounting cannot be set together (for RT units only) last will set cpuset cgroup attribute cpu.rt_runtime_us to 0 disabling any realtime task
 
 Note: tuna (Ref)
 

@@ -22,10 +22,10 @@ III- Character Classes
 
 IV- POSIX Classes
 
-[:alpha:] All alphabetic characters, upper and lower
-[:alnum:] All alphabetic and numeric characters
-[:upper:] All upper-case letters
-[:lower:] All lower-case letters
-[:digit:] All numbers
-[:punct:] All punctuation
-[:space:] All white-space characters
+[[:alpha:]] All alphabetic characters, upper and lower
+[[:alnum:]] All alphabetic and numeric characters
+[[:upper:]] All upper-case letters
+[[:lower:]] All lower-case letters
+[[:digit:]] All numbers
+[[:punct:]] All punctuation
+[[:space:]] All white-space characters

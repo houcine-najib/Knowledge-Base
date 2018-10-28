@@ -1,7 +1,7 @@
 I- Concepts                        
 #
 VFS           : virtual file system interface provides a common interface for different file system types.
-Inode         : index node containi metadata for a file system object(permissions,timestamps, data pointers).
+Inode         : index node contain metadata for a file system object(permissions,timestamps, data pointers).
 Extent        : an extent is a contiguous group of blocks.
 Journaling    : writes journal logs in journal area before writing actual user data to the file system.
 Copy-on-Write : file system does not overwrite existing blocks.
@@ -54,8 +54,8 @@ mk2fs : -n = dry-run formatting paratition
         -b = block size : 1024,2048 or 4096
         -i = inode for every bytes-per-inode bytes 
         -I = inode size in bytes (Default 256)
-        -E : stride       =stride-size RAID chunk-size / Block Size
-             stripe_width =stripe-width (Number of disks * stride)
+        -E : stride       = stride-size =  RAID chunk-size / Block Size
+             stripe_width = stripe-width = RAID Number of disks * stride
              discard :  discard blocks at mkfs (disbale nodiscard) 
         -J : size   = internel journal size in MB
              device = device of external journal (also label or uuid)

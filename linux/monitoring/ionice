@@ -1,0 +1,8 @@
+ionice : set/get process io scheduling class and priority only for CFQ
+
+ionice -c <class> -n <priority> <command>      
+ionice -c <class> -n <priority> -p <pid>
+       
+       class    : idle,best-effort,realtime
+       priority : 0 (Highest) .. 7 (Lowest) 
+  
