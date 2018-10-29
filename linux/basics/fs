@@ -61,8 +61,10 @@ mk2fs : -n = dry-run formatting paratition
         -J : size   = internel journal size in MB
              device = device of external journal (also label or uuid)
       
-        -O : journal_dev <external-journal> : create externel journal in device prior to mounting. 
-             <feature>                      : override filesystem default features (/etc/mke2fs.conf)
+        -O : journal_dev  : create externel journal in device prior to mounting. 
+             
+             <feature> / ^<no_feature>      : override filesystem default features (/etc/mke2fs.conf)
+             E.g: has_journal,extent ... ( man tune2fs )
       
         -T : usage type (small,big ....)
 
@@ -72,8 +74,11 @@ tune2fs : can be used to adjust most of these parameters (may need to be unmount
 Note: Number of disks in RAID is calculated : RAID 0  --> N
                                               RAID 1  --> N/2
                                               RAID 5  --> N-1
+                                              RAID 6  --> N-2
                                               RAID 10 --> N/2
 Stride size = [RAID chunk size] / [Filesystem block size]
+
+Convert ext4 with internal journal to external journal 
 
 2) XFS
 # Documenation available in /usr/share/doc/kernel-doc-<version>/Documenation/filesystems/xfs.txt
@@ -85,9 +90,9 @@ xfs_io -x -c "stat/statfs"   : get filesystem stats
 mkfs.xfs : -b : size=<bytes> filesystem block size (min 512,default 4kB,max 64KB )
            -d : agcount= number of allocation groups (number of CPUs)
                 agsize=<bytes> size of allocation group ( min 16 MB, max 1 TB)
-                sunit  = stripe unit (or chunk-size) of RAID array in 512-byte block 
+                sunit  = stripe unit (or chunk-size) of RAID array /  block size
                        = su = chunk-size in bytes
-                swidth = stripe width of RAID array in 512-byte block (number of disks in raid * 512 )
+                swidth = stripe width of RAID array in 512-byte block (number of disks in raid * sunit )
                        = sw = number of disks in raid
            -i : size   = inode size in bytes (default 256 ,max 2048)
                 maxpct = max % allocted to inode (default 25% <1TB, 5% <50TB,1% > 50TB)
@@ -123,7 +128,7 @@ mount -t ext4 -o    journal_path/journal_dev    = external journal path/device (
                     data           = journal   = metadata written prior to its data written into the main filesystem
                                      ordered   = data written prior to its metadata commited to journal (default mode)
                                      writeback = metadata written asynchronously from the corresponding data (highest-throughput)
-                                     kernel boot commandline : rootflags=data=<mode>
+                                     kernel boot commandline : rootflags=data=<mode> ( only if rootfs is ext3/ext4)
                     barrier=1/barrier=0 = barrier/nobarrier|
                     stripe              =  RAID5/6 data disks * ( chunk size / block size)  
                     norecovery/noload  
@@ -149,10 +154,12 @@ Example: filefrag -v /mnt/fsfrag/largefile
 1) Ext4
 #
 e2fsck     = report the percentage of fragmented files
-Example: e2fsck -fn /dev/sdb1 (should be umounted ?)
+Example: e2fsck -fn /dev/sdb1 (*) (must be  umounted)
 
 e2freefrag = report free space fragmentation
-Example: e2freefrag /dev/sdb1 (debugfs: freefrag)
+Example: e2freefrag /dev/sdb1 (*) (debugfs: freefrag)
+
+(*) device not mount point 
 
 e4defrag   = defragmentation tool
 Exmaple: e4defrag -v  <target> : target can be file,directory,device
