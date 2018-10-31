@@ -11,6 +11,6 @@ ltrace : library call tracing tool
 ltrace <command>             : trace command
 ltrace -p <PID>              : trace process
 ltrace -c <command>/-p <PID> : count library calls
-ltrace -e <system_call>      : filter a library call
+ltrace -e <lib_call>      : filter a library call
 ltrace -f <command>/-p <PID> : follow child processes
 ltrace -S <command>/-p <PID> : add system calls

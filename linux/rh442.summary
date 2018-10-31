@@ -1,0 +1,650 @@
+Chapter 2 :
+1- AWK
+awk -f awk_script
+awk -F="<filed sperator>" 
+awk /<regex_filter>/ 
+awk 'BEGIN {} {} END{}' 
+FS,OFS,$NF,$(NF-1)... $0 , NR
+if (cond) 
+system ( "<command> " $NF)
+
+2- SAR
+
+yum install sysstat
+alias sar='LANG=C sar' 24 Hour Format 
+sar   -f : input
+      -o : output
+      -s : start time
+      -e : end time
+      -i : interval
+      -A : all metrics
+      -u : CPU -P <CPU#>
+      -d : devices  stat ( -p names)
+      -q : queue/load-avg
+      -I : interrupts 
+      -n DEV : network card stat
+      -w : context switch
+      -W : Page swap
+      -r : memory page stat
+      -R : memory stat
+      -S : swap stat
+      -v : fs stat
+      -b : block stat
+      -B : paging stat
+      -H : Huge pages
+
+log files /var/log/sa/saXX ( day of mounth)
+
+/etc/sysconfig/sysstat HISTORY : 28 day default , SADC_OPTIONS : add other collect options DISK,POWER,INT ( man sadc -S) 
+
+/etc/cron.d/sysstat    : default every 10-min 
+
+3- GNUPLOT 
+
+gnuplot -p  -e '"if1=input_file"'  file.gnuplot
+        -p presist
+
+file.gnuplot
+
+set xdata time
+set timefmt '%H:%M:%S'
+
+set format x "%H:%M:%S"
+set format y '%.1f'
+  
+set xlabel  'X-LABEL'
+set ylabel  'Y-LABEL'
+
+set xrange [ <start_time> ... <end_time>]
+set yrange [1..10]
+
+set title 'GNUPLOT'
+
+set terminal png 
+set output  "image.png" 
+
+set linetype 1 lw 1 lc rbg "blue"
+set linetype 2 lw 2 lc rbg "red"
+
+plot  if1 using 1:2 title 'title-1' with lines lt 1 , \
+      if1 using 1:3 title 'title-2' with lines lt 2 ,\
+      if1 using 1:4 title 'title-3' with lines lt 3
+
+Note : Gnuplot help is interactive , you can use -e to pass if parameter
+
+4- PCP
+
+yum install pcp pcp-gui pcp-doc  pcp-system-tools pcp-libs pcp-conf
+
+systemctl enable pmcd
+systemctl start pmcd 
+pcp
+
+systemctl enable pmlogger
+systemctl start pmlogger
+
+pminfo : list all metrics ( pminfo --help)
+pmstat : vmstat-like
+pmval  : get metric value ( -s number of samples  , -d interval pmval --help)
+pmcollectl : -c count -i interval
+pmchart : GUI 
+
+Chapter 3 :
+
+1) Kernel Modules 
+enable module at boot : /etc/modules-load.d/module.conf with module name in it 
+list all modules  : lsmod
+list built-in modules : /lib/modules/$(uname -r )/modules.builtin
+
+insert module  insmod 
+               modprobe -v paramtere=value
+
+remove module  rmmmod
+               modprobe -rv
+
+list module parameters modinfo -p 
+
+set module parameters at boot : /etc/modprob.d/module.conf : options <module_name> <module_paramter>=value
+
+2) tuned / tuned-adm
+
+yum install tuned tuned-utils
+
+systemctl  enable tuned
+systemctl  start tuned
+
+tuned-adm recommand
+          off 
+          list
+          profile <profile>     <<<<<<<<<<<<<<<<<<<<<<<<<<<-- always check log : /var/log/tuned/tuned.log
+          active
+/etc/tuned/<new_profile> or /usr/lib/tuned/<new_profile>
+
+[main]
+summary=Description
+include=throughput-performance | network-latency | network-throughtput | latency-performance 
+# /usr/lib/tuned/
+
+[script]
+script=tuned-script.sh 
+  #!/bin/bash 
+  . /usr/lib/tuned/functions # grep  '^[^_].*()' /usr/lib/tuned/functions
+  start () {   } 
+  stop () { }
+  process $@
+   
+[variables]
+include=var-file.conf
+var1=value1 
+# call var by ${var1}
+
+[cpu]
+devices=* (all) , ! (not)
+governor= powersave | performance
+energy_perf_bias = powersave|normal|performance
+
+[vm]
+transparent_hugepages = never | madvise
+
+[bootloader]
+cmdline = kernel-parameters=value  # must unload and load to boot with changes or grub2-mkconfig -o /boot/grub
+
+[kernel-modules]
+<kernel-module> parameter=value
+
+[sysfs]
+/sys/file=value
+
+[sysctl]
+sysctl=value
+
+[scsi_host]
+alpm=min_power|medium_power|max_performance
+
+[net]
+devices=eth*
+wake_on_lan=d
+
+[usb]
+devices=usb*
+autosuspend=1
+
+[audio]
+timeout=10
+
+[disk]
+devices=sd*
+elevator=cfq|noop|deadline
+apm = hdparm -B
+spindown = hdparm -S
+readahead=4096
+quantum=number of dispatch queue
+
+3) tuna
+
+tuna -P : process
+     -Q : IRQs
+     -c/--cpus 
+     --isolate
+     --include
+     --move 
+     --spread
+     --threads
+     --irqs
+
+tuna : GUI
+
+Chapter 4 : 
+
+1) ulimit : per user session 
+
+/etc/security/limits.d/mylimits.conf ( man limits.conf)
+
+user       hard      as     <value in Kb>
+@group     soft      nproc  <value>
+                     nofile
+* (default entry)    maxlogins
+                     maxsyslogins
+
+Note: User must log off and log in back in order to take effect
+
+2) systemd limits
+systemd drop-in files : /etc/systemd/system/unit.service.d/drop-in.conf
+[Service]
+LimitNICE=
+LimitAS=
+LimitCPU=
+LimitNOFILE=
+
+systemd-analyze verify unit.service  <<<<<<<<<<<<<<<<<<<<<<<<<<-- always check
+systemctl daemon-reload 
+systemctl enable unit.service        <<<<<<<<<<<<<<<<<<<<<<<<<<-- always enable
+
+3) CGroup : systemd 
+
+slices : user , system , machine
+
+systemd-run --unit=   --slice= --scope  <command>
+systemctl set-property --runtime  --unit= <prop>=<value>
+
+systemd-cgls
+systemd-cgtop
+
+Limit systemd units ( man systemd.resource-control ) 
+systemd drop-in files : /etc/systemd/system/unit.service.d/drop-in.conf
+[Service]
+Slice=system-child_slice.slice <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-- a must
+
+CPUAccounting=true
+CPUShares= 2048 ( default = 1024)
+
+MemoryAccounting=true
+MemoryLimit=k,m,g
+
+BlockIOAccounting=true
+BlockIOWeight = 10 .. 1000 (default)
+BlockIODeviceWeight = <dev> <weight>
+
+DevicePolicy = auto | restrict | closed
+DeviceAllow  = <dev> r,w,m
+
+4) CGroup : sysfs
+lssubsys -am 
+Docs in /usr/share/doc/kernel-doc-<version>/Documenetaion/cgroup/
+
+Create CGroup mkdir /sys/fs/cgroup/<resource_controller>/<cgroup_name> : same level as user,system,machine slices
+echo PID > /sys/fs/cgroup/<resource_controller>/<cgroup_name>/tasks
+
+
+cpu : cpusets.txt
+/sys/fs/cgroup/cpu/system/system-child_slice/unit.service/
+
+mem : memory.txt
+/sys/fs/cgroup/mem/system/system-child_slice/unit.service/
+
+block : blkio-controller.txt
+/sys/fs/cgroup/blkio/system/system-child_slice/unit.service/
+
+net_prio,net_cls : net_prio.txt & net_cls.txt
+modprobe  netprio_cgroup
+
+Chapter 5 : Hardware Profile
+
+dmesg -T 
+dmidecode -s system-manufacturer 
+dmidecode -s system-product-name
+/sys/class/dmi/id
+
+CPU : lscpu /proc/cpuinfo , x86info -c/-a , getconf -a 
+Mem : /proc/meminfo , getconf -a , /proc/buddyinfo , /proc/zoneinfo 
+      dmidecode memory 
+Disk : lsblk -pt , lsblk -S ,lsblk -a , blkid 
+USB : lsusb -vv
+PCI : lspci -v
+
+sosreport  -o <enable_plugin>  -n <disable_plugin> --tmp-dir=/var/tmp ( /etc/sos.conf)
+           -p <profile_name> 
+           -l list plugins
+           --list-profiles
+
+Chapter 6  : Software Profile
+
+1) Kernel Scheduler 
+
+i- Scheduler 
+
+Realtime : SCHED_FIFO , SCHED_RR
+Non-RT   : SCHED_OTHER (SCHED_NORMAL=CFQ) , SCHED_BATCH , SCHED_IDLE
+
+ii-Priorities 
+
+140 priorities
+
+nice      : -20 ... 19
+RT        :   1 ... 99
+userspace :  100 .. 139
+
+
+top    : rt -99 -98 ..... -2
+             98  97 ....   1 
+         
+ps     : RTPRIO : 1 .. 99
+         PRI    : 139 ...    40  39 ... 0 (system)
+                   99 ...     1 -20 ... 19
+
+iii- Systemd   
+
+[Service]
+CPUSchedulingPolicy=rr,fifo,idle,batch,other             <<<<<<<<<<-- no cpushare
+CPUSchedulingPriority= 1..99 ( highest only for rt)
+
+iv- nice/renice
+
+for SCHED_OTHER  : -20 highest prio
+                    19 lowest  prio
+
+nice   -n <prio> <new_process>
+renice -n <prio> -p <pid>
+
+v- chrt
+chrt -m : list limits
+
+chrt -o : other     <prio>   <new_process>
+     -r : rr                 
+     -f : fifo
+     -i : idle
+     -b : batch 
+    
+chrt -p <type> <prio>  <pid>
+
+vi- Sysctl
+CFS ( /usr/share/doc/kernel-doc-<kernel-version>/Documentation/scheduler/sched-design-CFS.txt )
+kernel.sched_latency_ns             = new task every
+kernel.sched_min_granlarity_ns      = each task quota
+kernel.sched_wakeup_granularity_ns  = high prio wakeups
+
+RT  ( /usr/share/doc/kernel-doc-<kernel-version>/Documentation/scheduler/sched-rt-group.tx )
+
+kernel.sched_rt_period_us           = rt period
+kernel.sched_rt_runtime_us          = rt tasks quota ( 0 none , -1 disable ) 
+sched_rr_timeslice_ms               = rr time slice
+
+2) STrace
+strace <command>
+strace -p <pid>
+strace -e <system_calls>
+strace -c <summary_count>
+
+3) LTrace
+ltrace <command>
+ltrace -p <pid>
+ltrace -c <summary_count>
+ltrace -e <lib_calls>
+ltrace -S <add_syscalls>
+
+4) CPU Cache
+
+valgrind --tool=cachegrind <new process/command>
+
+perf stat -e cache-misses <command>
+perf stat -e cache-misses -p <pid> 
+ 
+Chapter 7 : Systemtap
+1) Installation
+
+subscription-manager repos --enable=rhel7-server-debug-rpms
+yum install kernel-devel-$(uname -r) kernel-debuginfo-$(uname -r) kernel-debuginfo-commun-$uname -r)
+
+yum install systemtap systemtap-client
+
+Note: stap-prep of systemtap-client can prepare it all <<<<<<<<<<-- save lot of time
+2) Usage
+
+stap example.stp -v
+
+3) Instrumentation modules
+stapusr : run modules in /lib/modules/$(uname -r)/systemtap 
+stapdev : compile modules only 
+users in stapusr & stapdev : can compile an run modules anywhere
+
+i- compile module 
+
+stap -r $(uname -r) example.stp -m module -p 4 -v 
+
+ii- run module
+
+staprun module.ko
+
+Chapter 8 : Disk 
+
+Documentation in /usr/share/doc/kernel-doc-<kernel-version>/block
+
+Block devices in /sys/block/sd,vd...
+
+Elevator : block io scheduler : noop     = (simple fifo )
+                                deadline = default for other ( read batch / write batch)
+                                cfq      = default for all SATA ( scheduling classes)
+
+use cases : noop     = virtula-guest , CPU-Bound on fast storage , SSD
+            deadline = guaranted latency , more reads than write , large IO operations
+            cfq      = no latency sensitive , no lage seek penality , large read/write opertions
+
+blkid , lsblk -pt , lsblk -l , /proc/
+
+Modify elevator 
+Method-1 : bootloader commandline : elevator=cfq|deadline|noop
+Method-2 : echo <cfq|deadline|noop> /sys/block/sd*,vd*/queue/scheduler
+Method-3 : tuned
+
+Elevator Independent Parameters ( doc queue-sysfs.txt )
+sysfs  : /sys/block/sd*,vd*/queue/ 
+         nr_requests   : number of IO requests queued at same time for read and write each
+         read_ahead_kb : readahead in KiB
+         nomerges      : dont merege requests
+
+deadline ( doc deadline-iosched.txt ) 
+sysfs  : /sys/block/sd,vd/queue/iosched/
+         fifo_batch   : number of read/write in single batch ( default 16 )
+         read_expire  : number of ms to schedule read requests
+         write_expire : number of ms to schedule write requests
+
+cfq  ( doc cfq-iosched.txt ) 
+sysfs  : /sys/block/sd,vd/queue/iosched/
+         quatum      : number of requests to send to one device at one time ( default 8 , 64 recommanded)
+         low_latency : 1 = fairness ( 300 ms latency)
+                       0 = throughput 
+
+CFQ Classes    : idle
+                 best-effort ( default)
+                 real-time
+CFQ Priorities : 0 ( lowest ) .. 7 ( higest) 
+                 default= 4 
+
+Systemd 
+[Service]
+IOSchedulingClass= idle, best-effort,real-time
+IOSchedulingPriority= 0..7
+DevicePolicy
+DeviceAllow
+
+ionice
+ionice -c <class> -n <prio> <command>
+ionice -c <class> -n <prio> -p <pid>
+
+iotop -o -P
+
+Chapter 9 : Memory
+1) Memory Leak & Process Mapping
+
+valgrind --tool=memcheck --leak-check=summary <command>
+valgrind --tool=memcheck --leak-check=full    <command>
+
+pmap -p <pid>    : memory mapping
+pmap -x -p <pid> : extended view
+
+pidstat -r -p <pid>
+
+
+
+2) SWAP & SWAPPINESS
+sysctl -w vm.swappiness = 10  : swap start at 90% memory pressure 
+                        = 90  : swap start at 10% memory pressure
+                        = 0   : disable swap
+                        = 100 : always  swap
+
+create swap space 
+
+mount  swap  space
+
+3) Memory Reclamation
+
+vm.dirty_expire_centisecs
+vm.dirty_ratio
+vm.dirty_background_ratio
+
+Note: use sync to flush all dirty pages to disk , sar -r or /proc/meminfo report dirty pages 
+
+4) NUMA
+
+Chapter 10 : CPU
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chapter 11 : FS & Network
+
+File Systems (XFS,EXT4)
+
+Network Perf
+server : qperf 
+client : qperf -t 60 --use_bits_per_sec server tcp_lat
+                                               tcp_bw
+
+
+Network Queues
+
+/usr/share/doc/kernel-doc-<version>/Documentation/sysctl/net.txt
+/usr/share/doc/kernel-doc-<version>/Documentation/networking/ip-sysctl.txt
+
+BDP ( Bytes)  = BW ( Mbps) * RTT (s) / 8 
+      
+
+net.core.rmem_default     <<<<<<<<<<<<<--   BDP/2
+net.core.wmem_default     <<<<<<<<<<<<<--   BDP/2
+net.core.rmem_max         <<<<<<<<<<<<<<--  BDP
+net.core.wmem_max         <<<<<<<<<<<<<<--  BDP
+
+net.ipv4.tcp_rmem        4096 BDP/2  BDP
+net.ipv4.tcp_wmem        4096 BDP/2  BDP
+
+net.core.busy_poll       50
+net.core.busy_read       50
+
+net.ipv4.tcp_fastopen    3 enable client/server
+
+net.ipv4.tcp_reuse       1 reuse half-closed ( TIME_WAIT ) tcp connection
+
+net.ipv4.tcp_sack       <<<<<<<<< improve performance over high-latency network
+net.ipv4.tcp_fack       
+
+net.core.dev_weight           <<<<<<<<<<<<<<<<<-- max packet can processed in single irq  
+
+net.ipv4.tcp_max_syn_backlog  max half-open tcp connections
+
+net.core.netdev_max_backlog   maximum #packets queued on device  : 10000  fo 10Gb 
+
+net.ipv4.tcp_window_scaling   enable/disable window scaling
+
+net.ipv4.tcp_available_congestion_control
+net.ipv4.tcp_allowed_congestion_control
+
+Network Teaming
+yum install -y teamd
+
+expamles in /usr/share/doc/teamd-<version>/examples_conf/ifcfg
+
+nmcli   ****** later for memory refreshing*******
+
+ifcfg
+
+monitor
+
+
+Chapter 12 : IPC/HP,THP/OC
+
+
+Chapter 13 : Power Management
+
+/sys/devices/*/*/power/control : auto : enable runtime device power management rdpm
+                                 on   : disbale rdpm
+                 
+                     autosuspend_delay_ms : suspend after ms
+      
+Suspend USB 
+/sys/bus/usb/devices/usb*/power/autosuspend : 0 : disable
+                                              1 : enable
+
+PCIE ASPM
+/sys/module/pcie_aspm/parameters/policy : default , performance , powersave
+disable at boot    : pcie_aspm=off
+set policy at boot : pcie_aspm.policy=<policy>
+
+Disable Watchdog
+sysctl kernel.nmi_watchdog=0
+
+Laptop Mode
+sysctl vm.laptop_mode = <timeout>
+                      = 0 disable
+
+yum install powertop tuned-utils  <<<<<<<<<<-- remember what you need dont search
+
+powertop  --html=report.html
+          -t time in second
+          -i iterations 
+
+powertop2tuned --input=report.html 
+               -n <new_profile>
+               -m <merge_with_profile>
+               -e : enable recommandation
+
+Chapter 14 : Virtulization
+Note:  to get help virsh help command
+
+Memory
+virsh memtune <domain>
+virsh memtune <domain> --hard-limit=<value>  --config  <<<<<<<<<<<<<-- alaways for persistence
+
+CPU
+virsh vcpuinfo <domain>
+
+virsh vcpupin <vcpu> <cpus> <domain> --config <<<<<<<<<<<<-- domain must be running
+
+virsh numatune <domain>
+virsh numatune <domain> --mode strict|preferred|interleave   --nodeset 0,1 
+
+Block
+virsh domblklist <domain> 
+virsh blkiotune <domain> 
+virsh blkiotune <doamin> --weight=<value> --config
+
+virsh blkdeviotune <dev> --limi_name=value <domain>
+Scheduler 
+virsh schedinfo <domain> 
+virsh schedinfo <domain> cpu_shares=<value> --config
+
+KSM and KSM TUNED          <<<<<<<<<<<<<<<-- disable before enable THP
+/usr/share/doc/kernel-doc-<kernel-version>/Documentation/vm/ksm.txt
+systemctl enable ksm
+systemctl start ksm
+
+systemctl enable ksmtuned       <<<<<<<<<<-- part of virtulaization install qemu-kvm-common
+systemctl start ksmtuned
+
+/etc/sysconfig/ksm
+/etc/ksmtuned.conf
+
+/sys/kernel/mm/ksm/ : run = 0 stop
+                            1 start
+                            2 stop and unmerge
+                      pages_to_scan      = page to scan in one cycle
+                      sleep_millisecs    = sleep between cycles
+                      merge_across_nodes = 0 no meger accross nodes
+
+View or edit vm xml found in /etc/libvirt/quemu/ to add other options 
+
+<memoryBacking>
+<locked/>    ( no swap )
+<hugepages/> ( use static huge page)
+<nomergepages/>
+</memoryBacking>

@@ -93,8 +93,10 @@ Total of 140 priorities :
 
 nice       -20 (highest) .. 19 (lowest) 
 real-time   1  (lowest)  .. 99 (highest) 
-user-space  100          .. 139 
 
+user-space   100             ..    139 (lowest)
+kerne-space  0 (highest)     ..    99  
+             
 top
 #
 NI     = niceness level  (user-space) -19 .. 20
@@ -113,7 +115,7 @@ Summary :
 RT          99  98     .....   2  1
 
 Nice                                -20  -19    ...  0      ...        18  19       
-top         RT -99     ...    -2 -1  0     1    ...  20     ...        38  39
+top         RT -99     ...    -1  0  
 
 ps         139 138     ...           39   40    ...  19     ...         1   0
                                    <-----                                  

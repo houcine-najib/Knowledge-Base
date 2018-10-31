@@ -65,7 +65,7 @@ ethtool -s ethO wol d
 #
 Configuration files (ifcfg-*):
 # 
-ETHTOOL OPTS="wol d"
+ETHTOOL_OPTS="wol d"
 
 VII- Laptop Mode
 # disbale laptop mode

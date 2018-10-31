@@ -36,9 +36,19 @@ All zones can be compacted such that free memory is available in contiguous bloc
 
 echo 1 > /proc/sys/vm/compact_memory 
 
+# Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/filesystems/proc.txt
+Per Proocess Memory statictics in /proc/<pid>/stat
+                                  /proc/<pid>/statm
+                                  /proc/<pid>/status E.g: VmSize, VmRSS = RssAnon + RssFile + RssShmem ,VmPTE(pid page table size )
+
+PageTables size in /proc/meminfo 
+
+Note: pidstat command can be used also
+
 III- HugePages and Transparent Huge Pages (THP)
 
 1- HugePages
+# Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Documentation/vm/hugetlbpage.txt
 /proc/meminfo 
 
 PageTables:       1244880 kB
@@ -69,7 +79,7 @@ In case application use mmap system call hugepages must be mounted :
 
 mount -t hugetlbfs none /largepage 
 
-
+Note: Hugepages are not swappable
 2- THP
 
 Enable/Disable at Runtime  /sys/kernel/mm/transparent_hugepage/enabled
