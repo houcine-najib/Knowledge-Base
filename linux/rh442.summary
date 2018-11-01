@@ -83,10 +83,11 @@ pcp
 systemctl enable pmlogger
 systemctl start pmlogger
 
-pminfo : list all metrics ( pminfo --help)
-pmstat : vmstat-like
-pmval  : get metric value ( -s number of samples  , -d interval pmval --help)
-pmcollectl : -c count -i interval
+pminfo       : list all metrics ( pminfo --help)
+pmstat       : vmstat-like
+pmval        : get metric value ( -s number of samples  , -d interval pmval --help)
+pmcollectl   : -c count -i interval
+pmcollect -s : subsystem cnmdj CNDJ
 pmchart : GUI 
 
 Chapter 3 :
@@ -128,9 +129,9 @@ include=throughput-performance | network-latency | network-throughtput | latency
 [script]
 script=tuned-script.sh 
   #!/bin/bash 
-  . /usr/lib/tuned/functions # grep  '^[^_].*()' /usr/lib/tuned/functions
-  start () {   } 
-  stop () { }
+  . /usr/lib/tuned/functions # grep  '^[^_].*()' /usr/lib/tuned/functions  <<<<<<-- don't forget
+  start () {   }              <<<<<<<<<<<<<<-- must have something or "retrun 0"
+  stop () { }                 <<<<<<<<<<<<<<-- same thing
   process $@
    
 [variables]
@@ -421,6 +422,7 @@ sysfs  : /sys/block/sd*,vd*/queue/
          nr_requests   : number of IO requests queued at same time for read and write each
          read_ahead_kb : readahead in KiB
          nomerges      : dont merege requests
+         physical_block_size : phyiscal sector size usualy 512 Byte
 
 deadline ( doc deadline-iosched.txt ) 
 sysfs  : /sys/block/sd,vd/queue/iosched/
@@ -452,6 +454,22 @@ ionice -c <class> -n <prio> <command>
 ionice -c <class> -n <prio> -p <pid>
 
 iotop -o -P
+
+RAID 
+
+Create Raid Array 
+
+mdadm --create /dev/md0 --level=<0,1,5,6,10> --raid-devices=2 --chunk=<chunk-size-in KiB> /dev/sdd1 /dev/sdd2 
+
+View RAID Details
+
+mdadm -D /dev/md0
+mdadm -E /dev/sdd1,2
+
+Calculate Chunk Size of Disk
+
+chunk-size = avgrq-sz ( in 512 Byte : iostat -x ) / number data disks
+           = KiB 
 
 Chapter 9 : Memory
 1) Memory Leak & Process Mapping
@@ -493,6 +511,9 @@ vm.dirty_ratio                <<<<<<<<<<<<<-- vm.dirty_bytes
 vm.dirty_background_ratio     <<<<<<<<<<<<<-- vm.dirty_background_bytes
 vm.min_free_kbytes
 
+vm.zone_reclaim_mode = 0 reclaim from all nodes
+                       1 reclaim form local node
+
 vm.drop_caches = 1 drop pagecache
                  2 drop dentries and inodes
                  3 drop all
@@ -501,6 +522,10 @@ vm.vfs_cache_pressure = 100   fair cache/reclaim
                         0      always cache
                         1..99  prefer cache
                         100... prefer reclaim 
+
+vm.max_map_count = 65536 : max number of memory areas process can map
+vm.page-cluster  = swap readahed
+vm.stat_interval = seconds for VM stat
 
 Note: use sync to flush all dirty pages to disk , sar -r or /proc/meminfo report dirty pages 
 
@@ -557,7 +582,7 @@ echo <cpu-list> > /proc/irq/#irq/smp_affinity_list
 
 IRQBALANCE SERVICE
 /etc/sysconfig/irqbalance      : IRQBALANCE_BANNED_CPUS=<BANNED_CPUS_FROM_BALANCING_MASK> <<<<<<-- 64 bit mask
-
+                                                         FFFFFFFF,FFFFFFFF                <<<<<<-- 32 sperated
 
 systemctl enable irqbalance.service
 systemctl start irqbalance.service
