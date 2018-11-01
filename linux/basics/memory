@@ -79,7 +79,11 @@ In case application use mmap system call hugepages must be mounted :
 
 mount -t hugetlbfs none /largepage 
 
-Note: Hugepages are not swappable
+Notes: 
+-Hugepages are not swappable
+-Application uses only shmat and shmget no hugetlbfs
+-Application only need to be run by user with GID in  /proc/sys/vm/hugetlb_shm_group
+
 2- THP
 
 Enable/Disable at Runtime  /sys/kernel/mm/transparent_hugepage/enabled
@@ -172,9 +176,9 @@ vm.panic_on_oom = enables/disables oom_killer.
                 = 1 kernel panic 
                 = 2 kernel panic for cgroups (+kdump)
 
-vm.oom_kill_allocating_task = specify task to for oom_kill 
+vm.oom_kill_allocating_task = specify task for OOM to kill
                             = 0 heuristic : rogue memory-hogging task
-                            = non-zero    : oom triggered task
+                            = <pid>       : task to oom
 
 /proc/<PID>/oom_score     : OOM score ,the higher value the likely <PID> OOM killer.(kernel and systemd are immune)
 /proc/<PID>/oom_adj       : determine oom score = -17     disbale oom_killer

@@ -154,7 +154,7 @@ Notes: taskset is not NUMA-aware.
 
 CPU Affinity for  kernel threads
  
-write-back bdi-flush :  /sys/bus/workqueue/devices/writeback/cpumask
+write-back bdi-flush :  /sys/devices/virtual/workqueue/writeback/cpumask
 
 watchdog             : /proc/sys/kernel/watchdog_cpumask
 

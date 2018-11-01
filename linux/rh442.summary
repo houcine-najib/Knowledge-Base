@@ -340,7 +340,7 @@ chrt -p <type> <prio>  <pid>
 vi- Sysctl
 CFS ( /usr/share/doc/kernel-doc-<kernel-version>/Documentation/scheduler/sched-design-CFS.txt )
 kernel.sched_latency_ns             = new task every
-kernel.sched_min_granlarity_ns      = each task quota
+kernel.sched_min_granlarity_ns      = each task quota / sheduler wakeup 
 kernel.sched_wakeup_granularity_ns  = high prio wakeups
 
 RT  ( /usr/share/doc/kernel-doc-<kernel-version>/Documentation/scheduler/sched-rt-group.tx )
@@ -464,8 +464,6 @@ pmap -x -p <pid> : extended view
 
 pidstat -r -p <pid>
 
-
-
 2) SWAP & SWAPPINESS
 sysctl -w vm.swappiness = 10  : swap start at 90% memory pressure 
                         = 90  : swap start at 10% memory pressure
@@ -473,38 +471,117 @@ sysctl -w vm.swappiness = 10  : swap start at 90% memory pressure
                         = 100 : always  swap
 
 create swap space 
+fdisk /dev/sdd
+n : new paratition --> p : primary --> # : number --> size --> t 82 --> w 
+mkswap -L <label> /dev/sdd{1,2} 
 
-mount  swap  space
+mount  swap  space 
+live       : swapon /dev/sdd1 -p <prio>
+/etc/fstab : /dev/sdd1 ( or LABEL = ) none swap sw,prio=<prio> 0 0
+swapon -a  : mount all swap swapce in /etc/fstab 
+
+umount swap space
+swapoff -a ( all swap space )
+swapoff /dev/sdd1
+
+swapon -s : view all swaps
 
 3) Memory Reclamation
 
 vm.dirty_expire_centisecs
-vm.dirty_ratio
-vm.dirty_background_ratio
+vm.dirty_ratio                <<<<<<<<<<<<<-- vm.dirty_bytes
+vm.dirty_background_ratio     <<<<<<<<<<<<<-- vm.dirty_background_bytes
+vm.min_free_kbytes
+
+vm.drop_caches = 1 drop pagecache
+                 2 drop dentries and inodes
+                 3 drop all
+
+vm.vfs_cache_pressure = 100   fair cache/reclaim
+                        0      always cache
+                        1..99  prefer cache
+                        100... prefer reclaim 
 
 Note: use sync to flush all dirty pages to disk , sar -r or /proc/meminfo report dirty pages 
 
 4) NUMA
+/sys/devices/system/node/node#/
+
+numastat -m : memory info
+         -p <pid> : numa stats fo pid
+
+numactl   --hardware              : numa topolgy 
+          --preferred=<nodeset>   : set prefrred node
+          --interleave=<nodeset>  : bounce between nodes ( all )
+          --membind=<nodeset>     : bind memory to nodes
+          --cpunodebind=<nodeset> : bind cpu to nodes
+          --physcpubind=<cpus>    : exectue on this specific cpu
+          --show                  : show policy
+
+numad :  balancing NUMA daemon , enabled  disable numa auto balancing
+         numad -S 0 -i <interval> -p <pid> : balance only for pid with interval
+
+Disable NUMA balancing
+sysctl -w kernel.numa_balancing=0
+bootloader cmdline : numa=off ( disable NUMA completly)
+                     numa_balancing=disable
 
 Chapter 10 : CPU
+1) Limit CPU with CGroup  <<<<<<<<<<<-- check CGroup
+
+2) Pin Process 
+
+Systemd 
+[Service]
+CPUAffinity= dash-range / space list
+
+CGroup cpuset subsytem ( for NUMA process)
+mkdir    /sys/fs/cgroup/cpuset/pinprocess
+echo <cpus> > /sys/fs/cgroup/cpuset/pinprocess/cpuset.cpus
+echo <mems> > /sys/fs/cgroup/cpuset/pinprocess/cpuset.mems
+echo <pids> > /sys/fs/cgroup/cpuset/pinprocess/tasks
+
+Runtime Process Pining        <<<<<<<<<<<<-- Not Recommanded by Redhat
+
+taskset -c <cpus> <command>
+taskset -pc <cpus> <pid>
+
+taskset -p <pid>    : get cpumask of pid <<<<<<<<-- useful to calculate cpu mask 
+
+3) IRQ Affinity 
+
+set irqaffinity of irq 
+
+echo <cpu-mask> > /proc/irq/#irq/smp_affinity
+echo <cpu-list> > /proc/irq/#irq/smp_affinity_list
+
+IRQBALANCE SERVICE
+/etc/sysconfig/irqbalance      : IRQBALANCE_BANNED_CPUS=<BANNED_CPUS_FROM_BALANCING_MASK> <<<<<<-- 64 bit mask
 
 
+systemctl enable irqbalance.service
+systemctl start irqbalance.service
+
+Calculate CPU Mask : E.g : CPU0 to CPU3 ( First to Fourth)
+                     printf '%8x' $[2**0+2**1+2**2+2**3]  = F ( or use bc to convert from dec to hex )
+                     E.g : Ban all CPU from IRQBALANCE except CPU0-CPU3 = Allow CPU0-CPU3 to handle IRQ
+                     printf '0x%X' $((0xFFFFFFFFFFFFFFFF)^(0xF)) = FFFFFFFFFFFFFFF0
 
 
+4) RT Scheduling        <<<<<<<<<<<--  check CPU Profiling
 
 
-
-
-
-
-
-
+5) Other CPU 
+bdi flush process cpumask : /sys/devices/virtual/workqueue/writeback/cpumask
+watch_dog cpumask         : sysctl -w kernel.watch_dog_cpumask=<cpulist>
 
 
 
 Chapter 11 : FS & Network
 
 File Systems (XFS,EXT4)
+sysctl fs.file-max : max total   file handlers
+       fs.nr_open  : max process file handlers
 
 Network Perf
 server : qperf 
@@ -561,7 +638,99 @@ ifcfg
 monitor
 
 
-Chapter 12 : IPC/HP,THP/OC
+Chapter 12 : IPC/HP,THP/OC/OOM
+
+1) Inter Process Communication
+
+Shared Memory
+sysctl kernel.shmmax : max shared memory segment in bytes 
+       kernel.shmmni : max number of shared memory segemnts
+       kernel.shmall : max shared memory  system wide in pages
+
+ipcs -l -m : view the above value
+ipcs -m    : view shared segment
+
+ipcmk -M <segment_size> : create shared segemnt
+
+ipcrm -M <id>           : remove shared segemnt
+
+Semaphores
+
+systcl kernel.sem     : 
+                        max semaphores per identifier/array
+                        max semaphores system wide
+                        max sem call ops per sem
+                        max semaphores arrays/identifiers
+
+ipcs -l -s        : those limits
+ipcs -s           : view semaphores
+ipcmk -S <smes>   : create semaphore
+ipcrm -S <id>     : remove semaphore
+
+Message Queue
+
+sysctl kernel.msgmni : maximum number of queue
+       kernel.msgmnb : default maximum queue size in bytes
+       kernel.msgmax : maximum queue  size in bytes
+
+ipcs -q -l 
+ipcs -q
+ipcmk -Q 
+ipcrm -Q <id>
+
+
+2) Over Commit Vitual Memory
+sysctl vm.overcommit_memory = 0 : moderate
+                              1 : always overcommit
+                              2 : strict
+
+systcl vm.overcommit_ratio = 0 .. 100 
+
+/proc/meminfo : CommitLimit : SWAP + Ratio*RAM
+
+3) Out Of Memory Killer
+
+systemd
+[Service]
+OOMAdjustScore= -1000 ( disable) ... 1000 ( OOM very likly)
+
+procfs
+/proc/<pid>/oom_score    
+/proc/<pid>/oom_adj       -17        15
+/proc/<pid>/oom_score_adj -1000 ... 1000  
+
+echo f > /proc/sysrq-trigger ( force OOM)
+
+sysctl vm.panic_on_oom = 0 kill
+                         1 kernel panic
+sysctl vm.oom_kill_allocating_task = <pid>
+
+4) Huge Pages and Transparent Huge Pages
+Documentation in /usr/share/doc/kernel-doc-<kernel-version>/Docuemntation/vm/hugetlbpage.txt
+Huge Pages  
+bootloader cmdline : default_hugepagesz= 
+                     hugepagesz=
+                     hugepages=
+
+sysfs (for 2MB hugepages)   /sys/kernel/mm/hugepages/hugepages-2048kB/ 
+                            nr_hugepages                sysctl vm.nr_hugepages
+                            nr_overcommit_hugepages     sysctl vm.nr_overcommit_hugepages
+                            nr_hugepages_mempolicy      sysctl vm.nr_hugepages_mempolicy
+
+cat /proc/meminfo | grep ^Huge
+
+hugetlbfs  : mount -t hugetlbfs none /lagepagefs ( used by mmap syscall) 
+
+Note: in order for user application use hugepages via  shmget() & shmat()  GID must be defined in vm.hugetlb_shm_group 
+
+Transparent Huge Pages
+bootloader cmdline : transparent_hugepage=always|madvise|never
+Tuned              : plugin vm : transparent_hupepages=always|madvise|never  <<<<<<<-- with an s
+sysfs               /sys/kernel/mm/transparent_hugepage/
+                    enabled=always|madvise|never
+                    
+
+cat /proc/meminfo | grep AnnoHugePages ( file based hugepages are not suuported)
 
 
 Chapter 13 : Power Management
