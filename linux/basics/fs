@@ -132,7 +132,7 @@ mount -t ext4 -o    journal_path/journal_dev    = external journal path/device (
                     barrier=1/barrier=0 = barrier/nobarrier|
                     stripe              =  RAID5/6 data disks * ( chunk size / block size)  
                     norecovery/noload  
-                    discard/nodiscard
+                    discard/nodiscard   = discard blocks marked free by the FS in device ( fstrim for SSD devices)
                     commit              = sync all data and metadata every nrsec seconds (default 5s)
           
 2) XFS

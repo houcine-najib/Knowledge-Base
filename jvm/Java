@@ -785,7 +785,8 @@ ccstrlist OnOutOfMemoryError                        =                           
      bool ZeroTLAB                                  = false                               {product}
      intx hashCode                                  = 5                                   {product}
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
--XX:CompileThreshold=nn number of method executions before a method is compiled
+-XX:CompileThreshold=nn : Number of method executions before a method is compiled
+-XX:+AlwaysPreTouch     : JVM will touch every page at startup (page fault overhead)
 ############################################################################################################
 Java Settings
 -XX:+PrintCommandLineFlags: Print flags specified on command line or set by ergonomics
